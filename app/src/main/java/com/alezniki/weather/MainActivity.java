@@ -20,6 +20,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity
@@ -57,11 +59,73 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.v("TAG", "RESPONSE: " + response.toString());
+
+                        try {
+                            // Grab the name and country from City Object {}
+                            JSONObject city = response.getJSONObject("city");
+
+                            String cityName = city.getString("name");
+                            String country = city.getString("country");
+                            Log.v("TAG", "City: " + cityName +", Country: " + country);
+
+                            // Grab data from List Array []
+                            JSONArray list = response.getJSONArray("list");
+
+                            // Do the for loop to get items number
+                            int cnt  = 10; // Number of lines returned by this API call
+
+                            for (int i = 0; i < cnt ; i++) {
+
+                                JSONObject listObject = list.getJSONObject(i);
+
+                                // Grab the main object {} inside upper object from List array
+                                JSONObject main = listObject.getJSONObject("main");
+                                double temperature = main.getDouble("temp"); // Metric: Celsius
+                                double tempMin = main.getDouble("temp_min"); // Metric: Celsius
+                                double tempMax = main.getDouble("temp_max"); // Metric: Celsius
+                                double pressure = main.getDouble("pressure"); // Atmospheric pressure hPa
+                                int humidity = main.getInt("humidity"); // Humidity %
+
+                                Log.v("TAG", "MAIN: Temperature: " + temperature + "˚C, Minimum temperature: "
+                                        + tempMin + "˚C, Maximum temperature:" + tempMax +
+                                        "˚C, Pressure: " + pressure + "hPa, Humidity: " + humidity + "%");
+
+                                // Grab the weather array [] which is at the same level as main object, inside list object
+                                JSONArray weatherArray = listObject.getJSONArray("weather");
+                                JSONObject weatherObject = weatherArray.getJSONObject(0);// Index range [0..1)
+                                String weatherMain = weatherObject.getString("main");
+                                String description = weatherObject.getString("description");
+
+                                Log.v("TAG", "WEATHER: Parameter: " + weatherMain + ", Condition: " + description);
+
+                                // Grab the clouds object {}, on the same list level
+                                JSONObject cloudsObject = listObject.getJSONObject("clouds");
+                                String cloudiness = cloudsObject.getString("all"); // Cloudiness %
+
+                                Log.v("TAG","CLOUDS: Cloudiness: " + cloudiness + "%");
+
+                                // Grab the wind object {}, on the same list level
+                                JSONObject windObject = listObject.getJSONObject("wind");
+                                String speed = windObject.getString("speed"); // Wind speed degrees
+                                String direction = windObject.getString("deg"); // Wind direction degrees
+
+                                Log.v("TAG","WIND: Speed: " + speed + " deg, Direction: " + direction + "deg");
+
+                                // Grab date  String from List Object
+                                String rawDate = listObject.getString("dt_txt");
+
+                                Log.v("TAG", "RAW DATE: " + rawDate);
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.v("TAG", "JSON ERROR: " + e.getLocalizedMessage());
+                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("TAG", "ERROR: " + error.getLocalizedMessage());
+                        Log.v("TAG", "RESPONSE ERROR: " + error.getLocalizedMessage());
                     }
                 });
 
