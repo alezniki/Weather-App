@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.alezniki.weather.model.WeatherData;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -80,23 +81,23 @@ public class MainActivity extends AppCompatActivity
 
                                 // Grab the main object {} inside upper object from List array
                                 JSONObject main = listObject.getJSONObject("main");
-                                double temperature = main.getDouble("temp"); // Metric: Celsius
-                                double tempMin = main.getDouble("temp_min"); // Metric: Celsius
-                                double tempMax = main.getDouble("temp_max"); // Metric: Celsius
+                                double temp = main.getDouble("temp"); // Metric: Celsius
+                                double minTemp = main.getDouble("temp_min"); // Metric: Celsius
+                                double maxTemp = main.getDouble("temp_max"); // Metric: Celsius
                                 double pressure = main.getDouble("pressure"); // Atmospheric pressure hPa
                                 int humidity = main.getInt("humidity"); // Humidity %
 
-                                Log.v("TAG", "MAIN: Temperature: " + temperature + "˚C, Minimum temperature: "
-                                        + tempMin + "˚C, Maximum temperature:" + tempMax +
+                                Log.v("TAG", "MAIN: Temperature: " + temp + "˚C, Minimum temperature: "
+                                        + minTemp + "˚C, Maximum temperature:" + maxTemp +
                                         "˚C, Pressure: " + pressure + "hPa, Humidity: " + humidity + "%");
 
                                 // Grab the weather array [] which is at the same level as main object, inside list object
                                 JSONArray weatherArray = listObject.getJSONArray("weather");
                                 JSONObject weatherObject = weatherArray.getJSONObject(0);// Index range [0..1)
-                                String weatherMain = weatherObject.getString("main");
+                                String mainWeather = weatherObject.getString("main");
                                 String description = weatherObject.getString("description");
 
-                                Log.v("TAG", "WEATHER: Parameter: " + weatherMain + ", Condition: " + description);
+                                Log.v("TAG", "WEATHER: Parameter: " + mainWeather + ", Condition: " + description);
 
                                 // Grab the clouds object {}, on the same list level
                                 JSONObject cloudsObject = listObject.getJSONObject("clouds");
@@ -113,9 +114,38 @@ public class MainActivity extends AppCompatActivity
 
                                 // Grab date  String from List Object
                                 String rawDate = listObject.getString("dt_txt");
+                                String[] splitDate = rawDate.split("_");
 
-                                Log.v("TAG", "RAW DATE: " + rawDate);
+                                String date = splitDate[0]; // dt
+                               // String time = splitDate[1]; // txt
 
+                                // Log.v("TAG", "RAW DATE: Date" + date + ", Time: " + time);
+
+
+                                WeatherData data = new WeatherData();
+
+                                data.setCityName(cityName);
+                                data.setCountry(country);
+                                data.setTemp((int) temp);
+                                data.setMinTemp((int) minTemp);
+                                data.setMaxTemp((int) maxTemp);
+                                data.setPressure((int) pressure);
+                                data.setHumidity(humidity);
+                                data.setMainWeather(mainWeather);
+                                data.setDescription(description);
+                                data.setCloudiness(cloudiness);
+                                data.setSpeed(speed);
+                                data.setDirection(direction);
+                                // data.setFormattedDate(rawDate);
+                                data.setDate(date);
+                                // data.setTime(time);
+                                // data.setRawDate(rawDate);
+
+                                String report = "City name: " + data.getCityName() + ",Country: " + data.getCountry() + ", Temp: " + data.getTemp() + "˚C, Pressure: " + pressure + "hpa"
+                                        + ", Weather description: " + data.getDescription() + ", Date: " + data.getDate();
+
+                                Toast.makeText(MainActivity.this, report, Toast.LENGTH_SHORT).show();
+                                Log.v("TAG", "WEATHER REPORT: " + report);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
