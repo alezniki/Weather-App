@@ -101,50 +101,49 @@ public class MainActivity extends AppCompatActivity
 
                                 // Grab the clouds object {}, on the same list level
                                 JSONObject cloudsObject = listObject.getJSONObject("clouds");
-                                String cloudiness = cloudsObject.getString("all"); // Cloudiness %
+                                String clouds = cloudsObject.getString("all"); // Cloudiness %
 
-                                Log.v("TAG","CLOUDS: Cloudiness: " + cloudiness + "%");
+                                Log.v("TAG","CLOUDS: Cloudiness: " + clouds + "%");
 
                                 // Grab the wind object {}, on the same list level
                                 JSONObject windObject = listObject.getJSONObject("wind");
-                                String speed = windObject.getString("speed"); // Wind speed degrees
-                                String direction = windObject.getString("deg"); // Wind direction degrees
+                                double speed = windObject.getDouble("speed"); // Wind speed degrees
+                                double direction = windObject.getDouble("deg"); // Wind direction degrees
 
-                                Log.v("TAG","WIND: Speed: " + speed + " deg, Direction: " + direction + "deg");
+                                Log.v("TAG","WIND: Speed: " + speed + " meter/sec, Direction: " + direction + "deg");
 
                                 // Grab date  String from List Object
                                 String rawDate = listObject.getString("dt_txt");
-                                String[] splitDate = rawDate.split("_");
 
-                                String date = splitDate[0]; // dt
-                               // String time = splitDate[1]; // txt
+                                String date = rawDate.split(" ")[0]; // dt
+                                String time = rawDate.split(" ")[1]; // txt
 
-                                // Log.v("TAG", "RAW DATE: Date" + date + ", Time: " + time);
+                                Log.v("TAG", "RAW DATE: Date" + date + ", Time: " + time);
 
 
-                                WeatherData data = new WeatherData();
+                                WeatherData wd = new WeatherData();
 
-                                data.setCityName(cityName);
-                                data.setCountry(country);
-                                data.setTemp((int) temp);
-                                data.setMinTemp((int) minTemp);
-                                data.setMaxTemp((int) maxTemp);
-                                data.setPressure((int) pressure);
-                                data.setHumidity(humidity);
-                                data.setMainWeather(mainWeather);
-                                data.setDescription(description);
-                                data.setCloudiness(cloudiness);
-                                data.setSpeed(speed);
-                                data.setDirection(direction);
-                                // data.setFormattedDate(rawDate);
-                                data.setDate(date);
-                                // data.setTime(time);
-                                // data.setRawDate(rawDate);
+                                wd.setCityName(cityName);
+                                wd.setCountry(country);
+                                wd.setTemp((int) temp);
+                                wd.setMinTemp((int) minTemp);
+                                wd.setMaxTemp((int) maxTemp);
+                                wd.setPressure((int) pressure);
+                                wd.setHumidity(humidity);
+                                wd.setMainWeather(mainWeather);
+                                wd.setDescription(description);
+                                wd.setClouds(clouds);
+                                wd.setSpeed((int) speed);
+                                wd.setDirection((int) direction);
+                                wd.setDate(date);
+                                wd.setTime(time);
 
-                                String report = "City name: " + data.getCityName() + ",Country: " + data.getCountry() + ", Temp: " + data.getTemp() + "˚C, Pressure: " + pressure + "hpa"
-                                        + ", Weather description: " + data.getDescription() + ", Date: " + data.getDate();
-
-                                Toast.makeText(MainActivity.this, report, Toast.LENGTH_SHORT).show();
+                                String report = "City name: " + wd.getCityName() + ", Country: " + wd.getCountry() + ", Temp: " + wd.getTemp() + "˚C, Min Temp: "
+                                        + minTemp + "˚C, Max Temp: " + maxTemp + "˚C, Pressure: " + pressure + " hpa, Humidity: " + humidity + "%, Weather: "
+                                        + mainWeather + ", Description: " + wd.getDescription() + ", Clouds: " + clouds + "%, Wind speed: " + speed
+                                        + " meter/sec, Wind direction: " + direction + " deg, Date: " + wd.getDate() + "Time: " + wd.getTime();
+//
+//                                Toast.makeText(MainActivity.this, report, Toast.LENGTH_SHORT).show();
                                 Log.v("TAG", "WEATHER REPORT: " + report);
                             }
                         } catch (JSONException e) {

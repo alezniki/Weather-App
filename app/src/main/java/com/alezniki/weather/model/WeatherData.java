@@ -18,26 +18,26 @@ public class WeatherData {
     private String mainWeather;
     private String description;
     // List Array - clouds object
-    private String cloudiness;
+    private String clouds;
     // List Array - wind object
-    private String speed;
-    private String direction;
+    private int speed;
+    private int direction;
     // Raw Date String
-    private String formattedDate;
+//    private String formattedDate;
     private String date;
     private String time;
-    private String rawDate;
+//    private String rawDate;
 
     public WeatherData() {
 
         //this.formattedDate = rawDateFormatted(formattedDate);
     }
 
-    public String rawDateFormatted(String rawDate) {
-        // Convert raw date into formatted date
-//        return rawDate;
-        return "TODAY";
-    }
+//    public String rawDateFormatted(String rawDate) {
+//        // Convert raw date into formatted date
+////        return rawDate;
+//        return "TODAY";
+//    }
 
 
     public String getCityName() {
@@ -112,38 +112,38 @@ public class WeatherData {
         this.description = description;
     }
 
-    public String getCloudiness() {
-        return cloudiness;
+    public String getClouds() {
+        return clouds;
     }
 
-    public void setCloudiness(String cloudiness) {
-        this.cloudiness = cloudiness;
+    public void setClouds(String clouds) {
+        this.clouds = clouds;
     }
 
-    public String getSpeed() {
+    public int getSpeed() {
         return speed;
     }
 
-    public void setSpeed(String speed) {
+    public void setSpeed(int speed) {
         this.speed = speed;
     }
 
-    public String getDirection() {
+    public int getDirection() {
         return direction;
     }
 
-    public void setDirection(String direction) {
+    public void setDirection(int direction) {
         this.direction = direction;
     }
 
-    public String getFormattedDate() {
-        return formattedDate;
-    }
-
-    public void setFormattedDate(String formattedDate) {
-//        this.formattedDate = formattedDate;
-        this.formattedDate = rawDateFormatted(formattedDate);
-    }
+//    public String getFormattedDate() {
+//        return formattedDate;
+//    }
+//
+//    public void setFormattedDate(String formattedDate) {
+////        this.formattedDate = formattedDate;
+//        this.formattedDate = rawDateFormatted(formattedDate);
+//    }
 
     public String getDate() {
         return date;
@@ -161,11 +161,12 @@ public class WeatherData {
         this.time = time;
     }
 
-    public String getRawDate() {
-        return rawDate;
-    }
+//    public String getRawDate() {
+//        return rawDate;
+//    }
+//
+//    public void setRawDate(String rawDate) {
+//        this.rawDate = rawDate;
+//    }
 
-    public void setRawDate(String rawDate) {
-        this.rawDate = rawDate;
-    }
 }
