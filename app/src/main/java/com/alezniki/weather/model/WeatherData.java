@@ -16,12 +16,12 @@ public class WeatherData {
     private int humidity;
     // List Array - weather array
     private String mainWeather;
-    private String description;
+    private String weatherDescription;
     // List Array - clouds object
     private String clouds;
     // List Array - wind object
-    private int speed;
-    private int direction;
+    private int windSpeed;
+    private int windDirection;
     // Raw Date String
 //    private String formattedDate;
     private String date;
@@ -104,12 +104,12 @@ public class WeatherData {
         this.mainWeather = mainWeather;
     }
 
-    public String getDescription() {
-        return description;
+    public String getWeatherDescription() {
+        return weatherDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setWeatherDescription(String weatherDescription) {
+        this.weatherDescription = weatherDescription;
     }
 
     public String getClouds() {
@@ -120,20 +120,20 @@ public class WeatherData {
         this.clouds = clouds;
     }
 
-    public int getSpeed() {
-        return speed;
+    public int getWindSpeed() {
+        return windSpeed;
     }
 
-    public void setSpeed(int speed) {
-        this.speed = speed;
+    public void setWindSpeed(int windSpeed) {
+        this.windSpeed = windSpeed;
     }
 
-    public int getDirection() {
-        return direction;
+    public int getWindDirection() {
+        return windDirection;
     }
 
-    public void setDirection(int direction) {
-        this.direction = direction;
+    public void setWindDirection(int windDirection) {
+        this.windDirection = windDirection;
     }
 
 //    public String getFormattedDate() {

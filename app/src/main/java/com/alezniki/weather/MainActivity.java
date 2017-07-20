@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,6 +27,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
         implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
@@ -38,12 +43,36 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient googleApiClient;
     private final int PERMISSION_LOCATION = 1;
 
+    // RecyclerView
+    private WeatherAdapter adapter;
+    private RecyclerView recycler;
+    private RecyclerView.LayoutManager layoutManager;
+
+    // Weather Data
+    private WeatherData wd;
+    private List<WeatherData> list;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       googleAPI();
+        // Construct the data source
+        list = new ArrayList<>();
+        // Create the adapter to convert the array to views
+        recycler = (RecyclerView) findViewById(R.id.recycler);
+
+        // 1. Improve RecyclerView performance
+        recycler.setHasFixedSize(true);
+        // 2. Use a linear layout manager
+        layoutManager = new LinearLayoutManager(this);
+        recycler.setLayoutManager(layoutManager);
+        //3. Create the adapter to convert the array to views
+        adapter = new WeatherAdapter(list, this);
+        recycler.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        googleAPI();
     }
 
     public void downloadWeatherData(Location location) {
@@ -95,9 +124,9 @@ public class MainActivity extends AppCompatActivity
                                 JSONArray weatherArray = listObject.getJSONArray("weather");
                                 JSONObject weatherObject = weatherArray.getJSONObject(0);// Index range [0..1)
                                 String mainWeather = weatherObject.getString("main");
-                                String description = weatherObject.getString("description");
+                                String weatherDescription = weatherObject.getString("description");
 
-                                Log.v("TAG", "WEATHER: Parameter: " + mainWeather + ", Condition: " + description);
+                                Log.v("TAG", "WEATHER: Parameter: " + mainWeather + ", Condition: " + weatherDescription);
 
                                 // Grab the clouds object {}, on the same list level
                                 JSONObject cloudsObject = listObject.getJSONObject("clouds");
@@ -107,10 +136,10 @@ public class MainActivity extends AppCompatActivity
 
                                 // Grab the wind object {}, on the same list level
                                 JSONObject windObject = listObject.getJSONObject("wind");
-                                double speed = windObject.getDouble("speed"); // Wind speed degrees
-                                double direction = windObject.getDouble("deg"); // Wind direction degrees
+                                double windSpeed = windObject.getDouble("speed"); // Wind speed degrees
+                                double windDirection = windObject.getDouble("deg"); // Wind direction degrees
 
-                                Log.v("TAG","WIND: Speed: " + speed + " meter/sec, Direction: " + direction + "deg");
+                                Log.v("TAG","WIND: Speed: " + windSpeed + " meter/sec, Direction: " + windDirection + "deg");
 
                                 // Grab date  String from List Object
                                 String rawDate = listObject.getString("dt_txt");
@@ -120,8 +149,7 @@ public class MainActivity extends AppCompatActivity
 
                                 Log.v("TAG", "RAW DATE: Date" + date + ", Time: " + time);
 
-
-                                WeatherData wd = new WeatherData();
+                                wd = new WeatherData();
 
                                 wd.setCityName(cityName);
                                 wd.setCountry(country);
@@ -131,20 +159,27 @@ public class MainActivity extends AppCompatActivity
                                 wd.setPressure((int) pressure);
                                 wd.setHumidity(humidity);
                                 wd.setMainWeather(mainWeather);
-                                wd.setDescription(description);
+                                wd.setWeatherDescription(weatherDescription);
                                 wd.setClouds(clouds);
-                                wd.setSpeed((int) speed);
-                                wd.setDirection((int) direction);
+                                wd.setWindSpeed((int) windSpeed);
+                                wd.setWindDirection((int) windDirection);
                                 wd.setDate(date);
                                 wd.setTime(time);
 
-                                String report = "City name: " + wd.getCityName() + ", Country: " + wd.getCountry() + ", Temp: " + wd.getTemp() + "˚C, Min Temp: "
-                                        + minTemp + "˚C, Max Temp: " + maxTemp + "˚C, Pressure: " + pressure + " hpa, Humidity: " + humidity + "%, Weather: "
-                                        + mainWeather + ", Description: " + wd.getDescription() + ", Clouds: " + clouds + "%, Wind speed: " + speed
-                                        + " meter/sec, Wind direction: " + direction + " deg, Date: " + wd.getDate() + "Time: " + wd.getTime();
-//
-//                                Toast.makeText(MainActivity.this, report, Toast.LENGTH_SHORT).show();
+                                String report = "City name: " + wd.getCityName() + ", Country: " + wd.getCountry()
+                                        + ", Temp: " + wd.getTemp() + "˚C, Min Temp: " + wd.getMinTemp() + "˚C, Max Temp: "
+                                        + wd.getMaxTemp() + "˚C, Pressure: " + wd.getPressure() + " hpa, Humidity: "
+                                        + wd.getHumidity() + "%, Weather: " + wd.getMainWeather() + ", Description: "
+                                        + wd.getWeatherDescription() + ", Clouds: " + wd.getClouds() + "%, Wind speed: "
+                                        + wd.getWindSpeed() + " meter/sec, Wind direction: " + wd.getWindDirection()
+                                        + " deg, Date: " + wd.getDate() + "Time: " + wd.getTime();
+
+                                Toast.makeText(MainActivity.this, report, Toast.LENGTH_SHORT).show();
                                 Log.v("TAG", "WEATHER REPORT: " + report);
+
+
+                                refreshUI();
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -160,8 +195,8 @@ public class MainActivity extends AppCompatActivity
 
         // Make the request
         Volley.newRequestQueue(this).add(jsonRequest);
-    }
 
+    }
 
     /**
      * .enableAutoManage(FragmentActivity, OnConnectionFailedListener)
@@ -176,6 +211,11 @@ public class MainActivity extends AppCompatActivity
                 .addConnectionCallbacks(this) // Called when the client is connected or disconnected from the service
                 .addOnConnectionFailedListener(this) // Callbacks for failed attempt to connect client to the service
                 .build();
+    }
+
+    public void refreshUI() {
+        list.add(wd);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
