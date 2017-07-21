@@ -44,16 +44,36 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         // Get element from your data set at this position
         final WeatherData pos = list.get(position);
 
-        // Get the first letter capitalized from Weather Description
-        String weatherDescription = pos.getWeatherDescription().substring(0, 1).toUpperCase()
-                + pos.getWeatherDescription().substring(1);
-
         holder.tvDate.setText(pos.getDate());
-        holder.tvDescription.setText(weatherDescription);
+        holder.tvDescription.setText(pos.getWeatherDescription());
         holder.tvTemp.setText(String.valueOf(pos.getDayTemp()) + "˚C");
         holder.tvHumidity.setText("Humidity: " + String.valueOf(pos.getHumidity()) + "%");
         holder.tvWindSpeed.setText("Wind speed: " + String.valueOf(pos.getWindSpeed()) + " m/s");
-        holder.ivImage.setImageResource(R.drawable.ic_action_sun);
+
+
+        switch (pos.getMainWeather()){
+            case WeatherData.WEATHER_DESCRIPTION_CLEAR_SKY:
+                holder.ivImage.setImageResource(R.drawable.ic_action_clear);
+                return;
+            case WeatherData.WEATHER_DESCRIPTION_FEW_CLOUDS:
+            case WeatherData.WEATHER_DESCRIPTION_SCATTERED_CLOUDS:
+            case WeatherData.WEATHER_DESCRIPTION_BROKEN_CLOUDS:
+                holder.ivImage.setImageResource(R.drawable.ic_action_clouds);
+                return;
+            case WeatherData.WEATHER_DESCRIPTION_SHOWER_RAIN:
+            case WeatherData.WEATHER_DESCRIPTION_RAIN:
+                holder.ivImage.setImageResource(R.drawable.ic_action_rain);
+                return;
+            case WeatherData.WEATHER_DESCRIPTION_THUNDERSTORM:
+                holder.ivImage.setImageResource(R.drawable.ic_action_thunder);
+                return;
+            case WeatherData.WEATHER_DESCRIPTION_SNOW:
+                holder.ivImage.setImageResource(R.drawable.ic_action_snow);
+                return;
+            case WeatherData.WEATHER_DESCRIPTION_MIST:
+                holder.ivImage.setImageResource(R.drawable.ic_action_mist);
+                return;
+        }
 
     }
 
@@ -82,7 +102,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             tvTemp = (TextView) itemView.findViewById(R.id.tv_temp);
             tvHumidity = (TextView) itemView.findViewById(R.id.tv_humidity);
             tvWindSpeed = (TextView) itemView.findViewById(R.id.tv_wind_speed);
+
             ivImage = (ImageView) itemView.findViewById(R.id.iv_image);
+
         }
     }
 

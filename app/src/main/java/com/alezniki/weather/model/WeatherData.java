@@ -5,10 +5,21 @@ package com.alezniki.weather.model;
  */
 
 public class WeatherData {
-    // City object
+
+    public static final String WEATHER_DESCRIPTION_CLEAR_SKY = "Clear sky";
+    public static final String WEATHER_DESCRIPTION_FEW_CLOUDS = "Few clouds";
+    public static final String WEATHER_DESCRIPTION_SCATTERED_CLOUDS = "Scattered clouds";
+    public static final String WEATHER_DESCRIPTION_BROKEN_CLOUDS = "Broken clouds";
+    public static final String WEATHER_DESCRIPTION_SHOWER_RAIN = "Shower rain";
+    public static final String WEATHER_DESCRIPTION_RAIN = "Rain";
+    public static final String WEATHER_DESCRIPTION_THUNDERSTORM = "Thunderstorm";
+    public static final String WEATHER_DESCRIPTION_SNOW = "Snow";
+    public static final String WEATHER_DESCRIPTION_MIST = "Mist";
+
+    // City and Country
     private String cityName;
     private String country;
-    // List Array - temp object
+    // Temperature
     private int dayTemp;
     private int minTemp;
     private int maxTemp;
@@ -17,12 +28,11 @@ public class WeatherData {
     private int morningTemp;
     private int pressure;
     private int humidity;
-    // List Array - weather array
+    // Weather
     private String mainWeather;
     private String weatherDescription;
-    // Clouds object
+    // Clouds and Wind
     private int clouds;
-    // LWind object
     private int windSpeed;
     private int windDirection;
     // Date String
