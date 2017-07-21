@@ -27,17 +27,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
-    // RequestQueue
-    public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast";
+    // RequestQueue : 16 day weather forecast
+    public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
     public static final String URL_COORDINATES = "?lat="; // ?lat=41.890251&lon=12.492373"; // Colosseum Rome
     public static final String URL_UNITS = "&units=metric";
     public static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
+
 
     // Use Google API builder
     private GoogleApiClient googleApiClient;
@@ -92,33 +95,39 @@ public class MainActivity extends AppCompatActivity
 
                         try {
                             // Grab the name and country from City Object {}
-                            JSONObject city = response.getJSONObject("city");
+                            JSONObject cityObject = response.getJSONObject("city");
 
-                            String cityName = city.getString("name");
-                            String country = city.getString("country");
+                            String cityName = cityObject.getString("name");
+                            String country = cityObject.getString("country");
                             Log.v("TAG", "City: " + cityName +", Country: " + country);
 
                             // Grab data from List Array []
-                            JSONArray list = response.getJSONArray("list");
+                            JSONArray listArray = response.getJSONArray("list");
 
                             // Do the for loop to get items number
-                            int cnt  = 10; // Number of lines returned by this API call
+                            int cnt  = 7; // Number of lines returned by this API call
 
                             for (int i = 0; i < cnt ; i++) {
 
-                                JSONObject listObject = list.getJSONObject(i);
+                                JSONObject listObject = listArray.getJSONObject(i);
 
                                 // Grab the main object {} inside upper object from List array
-                                JSONObject main = listObject.getJSONObject("main");
-                                double temp = main.getDouble("temp"); // Metric: Celsius
-                                double minTemp = main.getDouble("temp_min"); // Metric: Celsius
-                                double maxTemp = main.getDouble("temp_max"); // Metric: Celsius
-                                double pressure = main.getDouble("pressure"); // Atmospheric pressure hPa
-                                int humidity = main.getInt("humidity"); // Humidity %
+                                JSONObject tempObject = listObject.getJSONObject("temp");
+                                double dayTemp = tempObject.getDouble("day"); // Daily averaged temperature
+                                double minTemp = tempObject.getDouble("min"); // Min daily temperature
+                                double maxTemp = tempObject.getDouble("max"); // Max daily temperature
+                                double nightTemp = tempObject.getDouble("night"); // Night temperature
+                                double eveningTemp = tempObject.getDouble("eve"); // Evening temperature
+                                double morningTemp = tempObject.getDouble("morn"); // Morning temperature
 
-                                Log.v("TAG", "MAIN: Temperature: " + temp + "˚C, Minimum temperature: "
-                                        + minTemp + "˚C, Maximum temperature:" + maxTemp +
-                                        "˚C, Pressure: " + pressure + "hPa, Humidity: " + humidity + "%");
+                                double pressure = listObject.getDouble("pressure"); // Atmospheric pressure hPa
+                                int humidity = listObject.getInt("humidity"); // Humidity %
+
+                                Log.v("TAG", "MAIN: Day: " + dayTemp + " ˚C, Min: " + minTemp
+                                        + "˚C, Max:" + maxTemp + " ˚C, Night: " + nightTemp
+                                        + "˚C, Evening:" + eveningTemp + " ˚C, Morning: "
+                                        + morningTemp + " ˚C, Pressure: " + pressure
+                                        + " hPa, Humidity: " + humidity + "%");
 
                                 // Grab the weather array [] which is at the same level as main object, inside list object
                                 JSONArray weatherArray = listObject.getJSONArray("weather");
@@ -129,33 +138,33 @@ public class MainActivity extends AppCompatActivity
                                 Log.v("TAG", "WEATHER: Parameter: " + mainWeather + ", Condition: " + weatherDescription);
 
                                 // Grab the clouds object {}, on the same list level
-                                JSONObject cloudsObject = listObject.getJSONObject("clouds");
-                                String clouds = cloudsObject.getString("all"); // Cloudiness %
+                                int clouds = listObject.getInt("clouds"); // Cloudiness %
 
-                                Log.v("TAG","CLOUDS: Cloudiness: " + clouds + "%");
+                                Log.v("TAG","CLOUDS: " + clouds + " %");
 
                                 // Grab the wind object {}, on the same list level
-                                JSONObject windObject = listObject.getJSONObject("wind");
-                                double windSpeed = windObject.getDouble("speed"); // Wind speed degrees
-                                double windDirection = windObject.getDouble("deg"); // Wind direction degrees
+                                double windSpeed = listObject.getDouble("speed"); // Wind speed degrees
+                                double windDirection = listObject.getDouble("deg"); // Wind direction degrees
 
                                 Log.v("TAG","WIND: Speed: " + windSpeed + " meter/sec, Direction: " + windDirection + "deg");
 
                                 // Grab date  String from List Object
-                                String rawDate = listObject.getString("dt_txt");
+                                int rawDate = listObject.getInt("dt");
+                                Log.v("TAG", "RAW DATE: " + rawDate);
 
-                                String date = rawDate.split(" ")[0]; // dt
-                                String time = rawDate.split(" ")[1]; // txt
-
-                                Log.v("TAG", "RAW DATE: Date" + date + ", Time: " + time);
+                                String date = new SimpleDateFormat("yyyy-MM-dd")
+                                        .format(new Date(rawDate*1000L));
+                                Log.v("TAG", "DATE: " + date);
 
                                 wd = new WeatherData();
-
                                 wd.setCityName(cityName);
                                 wd.setCountry(country);
-                                wd.setTemp((int) temp);
+                                wd.setDayTemp((int) dayTemp);
                                 wd.setMinTemp((int) minTemp);
                                 wd.setMaxTemp((int) maxTemp);
+                                wd.setNightTemp((int) nightTemp);
+                                wd.setEveningTemp((int) eveningTemp);
+                                wd.setMorningTemp((int) morningTemp);
                                 wd.setPressure((int) pressure);
                                 wd.setHumidity(humidity);
                                 wd.setMainWeather(mainWeather);
@@ -164,19 +173,17 @@ public class MainActivity extends AppCompatActivity
                                 wd.setWindSpeed((int) windSpeed);
                                 wd.setWindDirection((int) windDirection);
                                 wd.setDate(date);
-                                wd.setTime(time);
 
                                 String report = "City name: " + wd.getCityName() + ", Country: " + wd.getCountry()
-                                        + ", Temp: " + wd.getTemp() + "˚C, Min Temp: " + wd.getMinTemp() + "˚C, Max Temp: "
-                                        + wd.getMaxTemp() + "˚C, Pressure: " + wd.getPressure() + " hpa, Humidity: "
-                                        + wd.getHumidity() + "%, Weather: " + wd.getMainWeather() + ", Description: "
-                                        + wd.getWeatherDescription() + ", Clouds: " + wd.getClouds() + "%, Wind speed: "
-                                        + wd.getWindSpeed() + " meter/sec, Wind direction: " + wd.getWindDirection()
-                                        + " deg, Date: " + wd.getDate() + "Time: " + wd.getTime();
+                                        + ", Day: " + wd.getDayTemp() + "˚C, Min: " + wd.getMinTemp() + "˚C, Max: "
+                                        + wd.getMaxTemp() + "˚C, Night: " + wd.getNightTemp() + "˚C, Evening: "
+                                        + wd.getEveningTemp() + "˚C, Morning: " + wd.getMorningTemp() + "˚C, Pressure: "
+                                        + wd.getPressure() + " hpa, Humidity: " + wd.getHumidity() + "%, Weather: "
+                                        + wd.getMainWeather() + ", Description: " + wd.getWeatherDescription()
+                                        + ", Clouds: " + wd.getClouds() + "%, Wind speed: " + wd.getWindSpeed()
+                                        + " meter/sec, Wind direction: " + wd.getWindDirection() + " deg, Date: " + wd.getDate();
 
-                                Toast.makeText(MainActivity.this, report, Toast.LENGTH_SHORT).show();
                                 Log.v("TAG", "WEATHER REPORT: " + report);
-
 
                                 refreshUI();
 

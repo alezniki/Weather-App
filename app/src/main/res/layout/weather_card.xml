@@ -43,8 +43,8 @@
                     android:id="@+id/tv_temp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Current: 14°C"
-                    android:textSize="16sp" />
+                    android:text="14°C"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tv_humidity"
@@ -57,7 +57,7 @@
                     android:id="@+id/tv_wind_speed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Wind speed: 19km/h"
+                    android:text="Wind speed: 19m/s"
                     android:textSize="16sp" />
             </LinearLayout>
 

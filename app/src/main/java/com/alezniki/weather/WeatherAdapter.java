@@ -44,16 +44,16 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         // Get element from your data set at this position
         final WeatherData pos = list.get(position);
 
-        // Get first letter capitalized from Weather Description
+        // Get the first letter capitalized from Weather Description
         String weatherDescription = pos.getWeatherDescription().substring(0, 1).toUpperCase()
                 + pos.getWeatherDescription().substring(1);
 
         holder.tvDate.setText(pos.getDate());
         holder.tvDescription.setText(weatherDescription);
-        holder.tvTemp.setText("Current: " + String.valueOf(pos.getTemp()) + "˚C");
+        holder.tvTemp.setText(String.valueOf(pos.getDayTemp()) + "˚C");
         holder.tvHumidity.setText("Humidity: " + String.valueOf(pos.getHumidity()) + "%");
-        holder.tvWindSpeed.setText("Wind speed: " + String.valueOf(pos.getWindSpeed()) + "m/s");
-        // holder.ivImage.setImageDrawable(R.drawable.ic_action_sun);
+        holder.tvWindSpeed.setText("Wind speed: " + String.valueOf(pos.getWindSpeed()) + " m/s");
+        holder.ivImage.setImageResource(R.drawable.ic_action_sun);
 
     }
 
@@ -85,21 +85,5 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             ivImage = (ImageView) itemView.findViewById(R.id.iv_image);
         }
     }
-
-    public void addDataToAdapter(List<WeatherData> dataList) {
-        this.list.addAll(dataList);
-        this.notifyItemRangeInserted(0, list.size() - 1);
-    }
-
-    public void clearDataFromAdapter() {
-        int listSize = this.list.size();
-        if (listSize > 0) {
-            for (int i = 0; i < listSize ; i++) {
-                this.list.remove(0);
-            }
-            this.notifyItemRangeInserted(0, listSize);
-        }
-    }
-
 
 }

@@ -8,37 +8,27 @@ public class WeatherData {
     // City object
     private String cityName;
     private String country;
-    // List Array - main object
-    private int temp;
+    // List Array - temp object
+    private int dayTemp;
     private int minTemp;
     private int maxTemp;
+    private int nightTemp;
+    private int eveningTemp;
+    private int morningTemp;
     private int pressure;
     private int humidity;
     // List Array - weather array
     private String mainWeather;
     private String weatherDescription;
-    // List Array - clouds object
-    private String clouds;
-    // List Array - wind object
+    // Clouds object
+    private int clouds;
+    // LWind object
     private int windSpeed;
     private int windDirection;
-    // Raw Date String
-//    private String formattedDate;
+    // Date String
     private String date;
-    private String time;
-//    private String rawDate;
 
-    public WeatherData() {
-
-        //this.formattedDate = rawDateFormatted(formattedDate);
-    }
-
-//    public String rawDateFormatted(String rawDate) {
-//        // Convert raw date into formatted date
-////        return rawDate;
-//        return "TODAY";
-//    }
-
+    public WeatherData() {}
 
     public String getCityName() {
         return cityName;
@@ -56,12 +46,12 @@ public class WeatherData {
         this.country = country;
     }
 
-    public int getTemp() {
-        return temp;
+    public int getDayTemp() {
+        return dayTemp;
     }
 
-    public void setTemp(int temp) {
-        this.temp = temp;
+    public void setDayTemp(int dayTemp) {
+        this.dayTemp = dayTemp;
     }
 
     public int getMinTemp() {
@@ -78,6 +68,30 @@ public class WeatherData {
 
     public void setMaxTemp(int maxTemp) {
         this.maxTemp = maxTemp;
+    }
+
+    public int getNightTemp() {
+        return nightTemp;
+    }
+
+    public void setNightTemp(int nightTemp) {
+        this.nightTemp = nightTemp;
+    }
+
+    public int getEveningTemp() {
+        return eveningTemp;
+    }
+
+    public void setEveningTemp(int eveningTemp) {
+        this.eveningTemp = eveningTemp;
+    }
+
+    public int getMorningTemp() {
+        return morningTemp;
+    }
+
+    public void setMorningTemp(int morningTemp) {
+        this.morningTemp = morningTemp;
     }
 
     public int getPressure() {
@@ -112,11 +126,11 @@ public class WeatherData {
         this.weatherDescription = weatherDescription;
     }
 
-    public String getClouds() {
+    public int getClouds() {
         return clouds;
     }
 
-    public void setClouds(String clouds) {
+    public void setClouds(int clouds) {
         this.clouds = clouds;
     }
 
@@ -136,15 +150,6 @@ public class WeatherData {
         this.windDirection = windDirection;
     }
 
-//    public String getFormattedDate() {
-//        return formattedDate;
-//    }
-//
-//    public void setFormattedDate(String formattedDate) {
-////        this.formattedDate = formattedDate;
-//        this.formattedDate = rawDateFormatted(formattedDate);
-//    }
-
     public String getDate() {
         return date;
     }
@@ -152,21 +157,5 @@ public class WeatherData {
     public void setDate(String date) {
         this.date = date;
     }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-//    public String getRawDate() {
-//        return rawDate;
-//    }
-//
-//    public void setRawDate(String rawDate) {
-//        this.rawDate = rawDate;
-//    }
 
 }
