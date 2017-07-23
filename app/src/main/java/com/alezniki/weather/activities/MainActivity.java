@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity
     public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
     public static final String URL_COORDINATES = "?lat="; // ?lat=41.890251&lon=12.492373"; // Colosseum Rome
     public static final String URL_UNITS = "&units=metric";
-    public static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
+    public static final String URL_API_KEY = "&APPID=cbda7fd332fd54982669ad4eb3fa527b";
 
 
     // Use Google API builder
