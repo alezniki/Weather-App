@@ -1,4 +1,4 @@
-package com.alezniki.weather;
+package com.alezniki.weather.activities;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -11,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.alezniki.weather.R;
+import com.alezniki.weather.WeatherAdapter;
 import com.alezniki.weather.model.WeatherData;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity
     public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
     public static final String URL_COORDINATES = "?lat="; // ?lat=41.890251&lon=12.492373"; // Colosseum Rome
     public static final String URL_UNITS = "&units=metric";
-    public static final String URL_API_KEY = "&APPID=cbda7fd332fd54982669ad4eb3fa527b";
+    public static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
 
 
     // Use Google API builder
@@ -202,7 +204,6 @@ public class MainActivity extends AppCompatActivity
 
         // Make the request
         Volley.newRequestQueue(this).add(jsonRequest);
-
     }
 
     /**
@@ -221,8 +222,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void refreshUI() {
-        list.add(wd);
-        adapter.notifyDataSetChanged();
+
+        list.add(wd); // Set up data
+        adapter.notifyDataSetChanged(); // // Refresh data
     }
 
     @Override
@@ -254,7 +256,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
         // Called whenever location is changed, work with location itself
-        downloadWeatherData(location);
+      downloadWeatherData(location);
 
     }
     public void startLocationServices() {

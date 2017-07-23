@@ -1,10 +1,13 @@
 package com.alezniki.weather.model;
 
+import java.io.Serializable;
+
 /**
  * Created by nikola on 7/20/17.
  */
 
-public class WeatherData {
+public class WeatherData implements Serializable {
+
 
     public static final String WEATHER_DESCRIPTION_CLEAR_SKY = "Clear sky";
     public static final String WEATHER_DESCRIPTION_FEW_CLOUDS = "Few clouds";
@@ -16,6 +19,8 @@ public class WeatherData {
     public static final String WEATHER_DESCRIPTION_SNOW = "Snow";
     public static final String WEATHER_DESCRIPTION_MIST = "Mist";
 
+    // Weather data ID
+    private int dataID;
     // City and Country
     private String cityName;
     private String country;
@@ -39,6 +44,10 @@ public class WeatherData {
     private String date;
 
     public WeatherData() {}
+
+    public int getDataID() {
+        return dataID;
+    }
 
     public String getCityName() {
         return cityName;
@@ -167,5 +176,4 @@ public class WeatherData {
     public void setDate(String date) {
         this.date = date;
     }
-
 }

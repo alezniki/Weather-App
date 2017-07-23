@@ -1,6 +1,7 @@
 package com.alezniki.weather;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alezniki.weather.activities.DetailActivity;
 import com.alezniki.weather.model.WeatherData;
 
 import java.util.List;
@@ -17,6 +19,8 @@ import java.util.List;
  */
 
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
+
+    public static final String KEY_ID = "key_id";
 
     private List<WeatherData> list; // List of weather data
     private Context context;
@@ -40,40 +44,53 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     // Replace the contents of a view (invoked by the layout manager)
     // This is where you supply data that you want to display to the user
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // Get element from your data set at this position
         final WeatherData pos = list.get(position);
 
         holder.tvDate.setText(pos.getDate());
-        holder.tvDescription.setText(pos.getWeatherDescription());
-        holder.tvTemp.setText(String.valueOf(pos.getDayTemp()) + "˚C");
+        holder.tvWeather.setText(pos.getMainWeather());
+        holder.tvTemp.setText(String.valueOf(pos.getDayTemp() + "˚C"));
         holder.tvHumidity.setText("Humidity: " + String.valueOf(pos.getHumidity()) + "%");
         holder.tvWindSpeed.setText("Wind speed: " + String.valueOf(pos.getWindSpeed()) + " m/s");
 
 
         switch (pos.getMainWeather()){
             case WeatherData.WEATHER_DESCRIPTION_CLEAR_SKY:
-                holder.ivImage.setImageResource(R.drawable.ic_action_clear);
+                holder.ivImage.setImageResource(R.drawable.ic_clear);
                 return;
             case WeatherData.WEATHER_DESCRIPTION_FEW_CLOUDS:
             case WeatherData.WEATHER_DESCRIPTION_SCATTERED_CLOUDS:
             case WeatherData.WEATHER_DESCRIPTION_BROKEN_CLOUDS:
-                holder.ivImage.setImageResource(R.drawable.ic_action_clouds);
+                holder.ivImage.setImageResource(R.drawable.ic_clouds);
                 return;
             case WeatherData.WEATHER_DESCRIPTION_SHOWER_RAIN:
             case WeatherData.WEATHER_DESCRIPTION_RAIN:
-                holder.ivImage.setImageResource(R.drawable.ic_action_rain);
+                holder.ivImage.setImageResource(R.drawable.ic_rain);
                 return;
             case WeatherData.WEATHER_DESCRIPTION_THUNDERSTORM:
-                holder.ivImage.setImageResource(R.drawable.ic_action_thunder);
+                holder.ivImage.setImageResource(R.drawable.ic_thunder);
                 return;
             case WeatherData.WEATHER_DESCRIPTION_SNOW:
-                holder.ivImage.setImageResource(R.drawable.ic_action_snow);
+                holder.ivImage.setImageResource(R.drawable.ic_snow);
                 return;
             case WeatherData.WEATHER_DESCRIPTION_MIST:
-                holder.ivImage.setImageResource(R.drawable.ic_action_mist);
+                holder.ivImage.setImageResource(R.drawable.ic_mist);
                 return;
         }
+
+        // Add click listener to the view
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Unique ID to pass between activities;
+                Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra(KEY_ID, pos);
+                context.startActivity(intent);
+
+            }
+        });
 
     }
 
@@ -88,24 +105,30 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvDate;
-        TextView tvDescription;
+        TextView tvWeather;
         TextView tvTemp;
         TextView tvHumidity;
         TextView tvWindSpeed;
         ImageView ivImage;
 
+        // Handle user events in a RecyclerView
+        public final View view;
+
+
         public ViewHolder(View itemView) {
             super(itemView);
 
             tvDate = (TextView) itemView.findViewById(R.id.tv_date);
-            tvDescription = (TextView) itemView.findViewById(R.id.tv_description);
+            tvWeather = (TextView) itemView.findViewById(R.id.tv_weather);
             tvTemp = (TextView) itemView.findViewById(R.id.tv_temp);
             tvHumidity = (TextView) itemView.findViewById(R.id.tv_humidity);
             tvWindSpeed = (TextView) itemView.findViewById(R.id.tv_wind_speed);
 
             ivImage = (ImageView) itemView.findViewById(R.id.iv_image);
 
+            // Now the view reference will be available to the rest of the adapter
+            view = itemView;
+
         }
     }
-
 }
