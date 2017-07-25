@@ -45,8 +45,21 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     // This is where you supply data that you want to display to the user
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+
         // Get element from your data set at this position
         final WeatherData pos = list.get(position);
+
+        // Add click listener to the view
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Unique ID to pass between activities;
+                Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra(KEY_ID, pos);
+                context.startActivity(intent);
+            }
+        });
 
         holder.tvDate.setText(pos.getDate());
         holder.tvWeather.setText(pos.getMainWeather());
@@ -59,15 +72,13 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             case WeatherData.WEATHER_DESCRIPTION_CLEAR_SKY:
                 holder.ivImage.setImageResource(R.drawable.ic_clear);
                 return;
-            case WeatherData.WEATHER_DESCRIPTION_FEW_CLOUDS:
-            case WeatherData.WEATHER_DESCRIPTION_SCATTERED_CLOUDS:
-            case WeatherData.WEATHER_DESCRIPTION_BROKEN_CLOUDS:
+            case WeatherData.WEATHER_DESCRIPTION_CLOUDS:
                 holder.ivImage.setImageResource(R.drawable.ic_clouds);
                 return;
-            case WeatherData.WEATHER_DESCRIPTION_SHOWER_RAIN:
-            case WeatherData.WEATHER_DESCRIPTION_RAIN:
+            case WeatherData.WEATHER_DESCRIPTION_RAIN: {
                 holder.ivImage.setImageResource(R.drawable.ic_rain);
                 return;
+            }
             case WeatherData.WEATHER_DESCRIPTION_THUNDERSTORM:
                 holder.ivImage.setImageResource(R.drawable.ic_thunder);
                 return;
@@ -78,20 +89,6 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
                 holder.ivImage.setImageResource(R.drawable.ic_mist);
                 return;
         }
-
-        // Add click listener to the view
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // Unique ID to pass between activities;
-                Intent intent = new Intent(context, DetailActivity.class);
-                intent.putExtra(KEY_ID, pos);
-                context.startActivity(intent);
-
-            }
-        });
-
     }
 
     // Return the size of your data set (invoked by the layout manager)
@@ -128,7 +125,23 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
             // Now the view reference will be available to the rest of the adapter
             view = itemView;
+        }
+    }
 
+
+    public void addDataToAdapter(List<WeatherData> dataList) {
+        this.list.addAll(dataList);
+        this.notifyItemRangeInserted(0, list.size() - 1);
+    }
+
+    public void clearDataFromAdapter() {
+        int listSize = this.list.size();
+        if (listSize > 0) {
+            for (int i = 0; i < listSize; i++) {
+                this.list.remove(0);
+            }
+
+            this.notifyItemRangeRemoved(0, listSize);
         }
     }
 }

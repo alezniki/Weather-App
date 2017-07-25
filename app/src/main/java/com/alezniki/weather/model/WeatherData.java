@@ -9,11 +9,8 @@ import java.io.Serializable;
 public class WeatherData implements Serializable {
 
 
-    public static final String WEATHER_DESCRIPTION_CLEAR_SKY = "Clear sky";
-    public static final String WEATHER_DESCRIPTION_FEW_CLOUDS = "Few clouds";
-    public static final String WEATHER_DESCRIPTION_SCATTERED_CLOUDS = "Scattered clouds";
-    public static final String WEATHER_DESCRIPTION_BROKEN_CLOUDS = "Broken clouds";
-    public static final String WEATHER_DESCRIPTION_SHOWER_RAIN = "Shower rain";
+    public static final String WEATHER_DESCRIPTION_CLEAR_SKY = "Clear";
+    public static final String WEATHER_DESCRIPTION_CLOUDS = "Clouds";
     public static final String WEATHER_DESCRIPTION_RAIN = "Rain";
     public static final String WEATHER_DESCRIPTION_THUNDERSTORM = "Thunderstorm";
     public static final String WEATHER_DESCRIPTION_SNOW = "Snow";

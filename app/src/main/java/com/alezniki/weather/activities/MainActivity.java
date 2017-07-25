@@ -1,14 +1,21 @@
 package com.alezniki.weather.activities;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.alezniki.weather.R;
@@ -35,14 +42,13 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
+       implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
     // RequestQueue : 16 day weather forecast
     public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
     public static final String URL_COORDINATES = "?lat="; // ?lat=41.890251&lon=12.492373"; // Colosseum Rome
     public static final String URL_UNITS = "&units=metric";
     public static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
-
 
     // Use Google API builder
     private GoogleApiClient googleApiClient;
@@ -75,9 +81,40 @@ public class MainActivity extends AppCompatActivity
         //3. Create the adapter to convert the array to views
         adapter = new WeatherAdapter(list, this);
         recycler.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
 
         googleAPI();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (adapter != null && recycler != null) {
+            adapter.clearDataFromAdapter();
+//            adapter.notifyDataSetChanged();
+        }
+
+        adapter.notifyDataSetChanged();
+
+
+
+//        // Make sure that GPS is enabled on the device
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            //allowLocationPermission();
+            Snackbar snack =  Snackbar.make(findViewById(R.id.recycler),"Please enable location", Snackbar.LENGTH_INDEFINITE);
+            snack.setAction("Enable", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+                }
+            });
+            snack.show();
+        }
+
     }
 
     public void downloadWeatherData(Location location) {
@@ -101,15 +138,15 @@ public class MainActivity extends AppCompatActivity
 
                             String cityName = cityObject.getString("name");
                             String country = cityObject.getString("country");
-                            Log.v("TAG", "City: " + cityName +", Country: " + country);
+                            Log.v("TAG", "City: " + cityName + ", Country: " + country);
 
                             // Grab data from List Array []
                             JSONArray listArray = response.getJSONArray("list");
 
                             // Do the for loop to get items number
-                            int cnt  = 7; // Number of lines returned by this API call
+                            int cnt = 7; // Number of lines returned by this API call
 
-                            for (int i = 0; i < cnt ; i++) {
+                            for (int i = 0; i < cnt; i++) {
 
                                 JSONObject listObject = listArray.getJSONObject(i);
 
@@ -142,20 +179,20 @@ public class MainActivity extends AppCompatActivity
                                 // Grab the clouds object {}, on the same list level
                                 int clouds = listObject.getInt("clouds"); // Cloudiness %
 
-                                Log.v("TAG","CLOUDS: " + clouds + " %");
+                                Log.v("TAG", "CLOUDS: " + clouds + " %");
 
                                 // Grab the wind object {}, on the same list level
                                 double windSpeed = listObject.getDouble("speed"); // Wind speed degrees
                                 double windDirection = listObject.getDouble("deg"); // Wind direction degrees
 
-                                Log.v("TAG","WIND: Speed: " + windSpeed + " meter/sec, Direction: " + windDirection + "deg");
+                                Log.v("TAG", "WIND: Speed: " + windSpeed + " meter/sec, Direction: " + windDirection + "deg");
 
                                 // Grab date  String from List Object
                                 int rawDate = listObject.getInt("dt");
                                 Log.v("TAG", "RAW DATE: " + rawDate);
 
                                 String date = new SimpleDateFormat("yyyy-MM-dd")
-                                        .format(new Date(rawDate*1000L));
+                                        .format(new Date(rawDate * 1000L));
                                 Log.v("TAG", "DATE: " + date);
 
                                 wd = new WeatherData();
@@ -176,17 +213,6 @@ public class MainActivity extends AppCompatActivity
                                 wd.setWindDirection((int) windDirection);
                                 wd.setDate(date);
 
-                                String report = "City name: " + wd.getCityName() + ", Country: " + wd.getCountry()
-                                        + ", Day: " + wd.getDayTemp() + "˚C, Min: " + wd.getMinTemp() + "˚C, Max: "
-                                        + wd.getMaxTemp() + "˚C, Night: " + wd.getNightTemp() + "˚C, Evening: "
-                                        + wd.getEveningTemp() + "˚C, Morning: " + wd.getMorningTemp() + "˚C, Pressure: "
-                                        + wd.getPressure() + " hpa, Humidity: " + wd.getHumidity() + "%, Weather: "
-                                        + wd.getMainWeather() + ", Description: " + wd.getWeatherDescription()
-                                        + ", Clouds: " + wd.getClouds() + "%, Wind speed: " + wd.getWindSpeed()
-                                        + " meter/sec, Wind direction: " + wd.getWindDirection() + " deg, Date: " + wd.getDate();
-
-                                Log.v("TAG", "WEATHER REPORT: " + report);
-
                                 refreshUI();
 
                             }
@@ -202,7 +228,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-        // Make the request
+        // Make the Volley request
         Volley.newRequestQueue(this).add(jsonRequest);
     }
 
@@ -222,12 +248,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void refreshUI() {
-
-        list.add(wd); // Set up data
+        list.add(wd);
         adapter.notifyDataSetChanged(); // // Refresh data
     }
 
-    @Override
+   @Override
     public void onConnectionSuspended(int i) {
 
     }
@@ -256,9 +281,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
         // Called whenever location is changed, work with location itself
-      downloadWeatherData(location);
+        downloadWeatherData(location);
 
     }
+
     public void startLocationServices() {
         Log.v("TAG", "Starting Location Services Called");
         try {
@@ -278,18 +304,47 @@ public class MainActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         // grantResults: the results of the permissions being granted
-        switch (requestCode) {
-            case PERMISSION_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // if more than zero permissions have been granted then we grab the first one and if permission  is granted we start location services
-                    startLocationServices();
-                    Log.v("TAG", "Permission Granted - Starting Services");
-                } else {
-                    // if its not been granted show a dialog to a user
-                    Log.v("TAG", "Permission Not Granted");
-                    Toast.makeText(this, "Weather can't run your location because you denied permission", Toast.LENGTH_LONG).show();
+        if (requestCode == PERMISSION_LOCATION) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // if more than zero permissions have been granted then we grab the first one and if permission  is granted we start location services
+                startLocationServices();
+
+                Log.v("TAG", "Permission Granted - Starting Services");
+            } else {
+                // if its not been granted show a dialog to a user requesting that GPS be enabled
+                Log.v("TAG", "Permission Not Granted");
+                Toast.makeText(this, "Weather can't run your location because you denied permission", Toast.LENGTH_LONG).show();
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                    Snackbar snack =  Snackbar.make(findViewById(R.id.recycler),"Allow Permission", Snackbar.LENGTH_INDEFINITE);
+                    snack.setAction("Request", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            checkAndRequestPermissions();
+
+                        }
+                    });
+                    snack.show();
                 }
+
             }
         }
+    }
+
+
+    private  boolean checkAndRequestPermissions() {
+        int locationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (locationPermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),1);
+            return false;
+        }
+        return true;
     }
 }
