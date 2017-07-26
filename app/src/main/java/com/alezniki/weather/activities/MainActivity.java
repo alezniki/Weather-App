@@ -1,16 +1,21 @@
 package com.alezniki.weather.activities;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -83,7 +88,6 @@ public class MainActivity extends AppCompatActivity
         recycler.setAdapter(adapter);
 
         googleAPI();
-
     }
 
     @Override
@@ -92,30 +96,17 @@ public class MainActivity extends AppCompatActivity
 
         if (adapter != null && recycler != null) {
             adapter.clearDataFromAdapter();
-//            adapter.notifyDataSetChanged();
         }
 
-        adapter.notifyDataSetChanged();
+        enableLocation();
 
-
-
-//        // Make sure that GPS is enabled on the device
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            //allowLocationPermission();
-            Snackbar snack =  Snackbar.make(findViewById(R.id.recycler),"Please enable location", Snackbar.LENGTH_INDEFINITE);
-            snack.setAction("Enable", new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-
-                }
-            });
-            snack.show();
+        if (!isNetworkConnected()) {
+            Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
+            checkNetworkDialog();
         }
 
     }
+
 
     public void downloadWeatherData(Location location) {
 
@@ -225,6 +216,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.v("TAG", "RESPONSE ERROR: " + error.getLocalizedMessage());
+
                     }
                 });
 
@@ -252,7 +244,26 @@ public class MainActivity extends AppCompatActivity
         adapter.notifyDataSetChanged(); // // Refresh data
     }
 
-   @Override
+    private void enableLocation() {
+        // Make sure that GPS is enabled on the device
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Snackbar snack = Snackbar.make(findViewById(R.id.recycler), "Please enable location", Snackbar.LENGTH_INDEFINITE);
+            snack.setAction("Enable", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+                }
+            });
+
+            snack.show();
+        }
+    }
+
+
+    @Override
     public void onConnectionSuspended(int i) {
 
     }
@@ -318,7 +329,7 @@ public class MainActivity extends AppCompatActivity
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                    Snackbar snack =  Snackbar.make(findViewById(R.id.recycler),"Allow Permission", Snackbar.LENGTH_INDEFINITE);
+                    Snackbar snack = Snackbar.make(findViewById(R.id.recycler), "Allow Permission", Snackbar.LENGTH_INDEFINITE);
                     snack.setAction("Request", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -334,7 +345,8 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private  boolean checkAndRequestPermissions() {
+    // Check if user denied location and request permission
+    private boolean checkAndRequestPermissions() {
         int locationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -342,9 +354,47 @@ public class MainActivity extends AppCompatActivity
             listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
         if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),1);
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), 1);
             return false;
         }
         return true;
     }
+
+
+    // Checking the Network Connection
+    private boolean isNetworkConnected() {
+
+        // 1. Retrieves an instance of the ConnectivityManager class from the current application context.
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        // 2.Retrieves an instance of the NetworkInfo class that represents the current network connection.
+        // This will be null if no network is available.
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        // 3. Check if there is an available network connection and the device is connected.
+        // Should check null because in airplane mode it will be null
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    // Show dialog to the user if there is no internet connection
+    private void checkNetworkDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage("Check your network settings and try again");
+
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+            }
+        });
+
+        Dialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
 }
