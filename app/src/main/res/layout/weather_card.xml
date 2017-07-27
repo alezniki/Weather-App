@@ -29,35 +29,30 @@
                     android:id="@+id/tv_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Today's Date"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/tv_weather"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Partly sunny"
                     android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/tv_temp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="14°C"
                     android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tv_humidity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Humidity: 82%"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/tv_wind_speed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Wind speed: 19m/s"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -66,8 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="1"
-                android:src="@drawable/ic_clear" />
+                android:layout_weight="1"/>
         </LinearLayout>
     </LinearLayout>
 

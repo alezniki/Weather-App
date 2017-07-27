@@ -1,4 +1,4 @@
-package com.alezniki.weather;
+package com.alezniki.weather.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alezniki.weather.R;
 import com.alezniki.weather.activities.DetailActivity;
 import com.alezniki.weather.model.WeatherData;
 
@@ -37,7 +38,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
         LayoutInflater inflater = LayoutInflater.from(context);
         View itemView = inflater.inflate(R.layout.weather_card, parent, false);
-        
+
         return new ViewHolder(itemView);
     }
 
@@ -63,8 +64,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
         holder.tvDate.setText(pos.getDate());
         holder.tvWeather.setText(pos.getMainWeather());
-        holder.tvTemp.setText(String.valueOf(pos.getDayTemp() + "˚C"));
-        holder.tvHumidity.setText("Humidity: " + String.valueOf(pos.getHumidity()) + "%");
+        holder.tvTemp.setText(String.valueOf(pos.getDayTemp() + " ˚C"));
+        holder.tvHumidity.setText("Humidity: " + String.valueOf(pos.getHumidity()) + " %");
         holder.tvWindSpeed.setText("Wind speed: " + String.valueOf(pos.getWindSpeed()) + " m/s");
 
 
@@ -98,7 +99,6 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         return list.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvDate;
@@ -129,10 +129,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
 
-    public void addDataToAdapter(List<WeatherData> dataList) {
-        this.list.addAll(dataList);
-        this.notifyItemRangeInserted(0, list.size() - 1);
-    }
+//    public void addDataToAdapter(List<WeatherData> dataList) {
+//        this.list.addAll(dataList);
+//        this.notifyItemRangeInserted(0, list.size() - 1);
+//    }
 
     public void clearDataFromAdapter() {
         int listSize = this.list.size();

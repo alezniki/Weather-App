@@ -8,7 +8,6 @@ import java.io.Serializable;
 
 public class WeatherData implements Serializable {
 
-
     public static final String WEATHER_DESCRIPTION_CLEAR_SKY = "Clear";
     public static final String WEATHER_DESCRIPTION_CLOUDS = "Clouds";
     public static final String WEATHER_DESCRIPTION_RAIN = "Rain";
@@ -16,8 +15,6 @@ public class WeatherData implements Serializable {
     public static final String WEATHER_DESCRIPTION_SNOW = "Snow";
     public static final String WEATHER_DESCRIPTION_MIST = "Mist";
 
-    // Weather data ID
-    private int dataID;
     // City and Country
     private String cityName;
     private String country;
@@ -41,10 +38,6 @@ public class WeatherData implements Serializable {
     private String date;
 
     public WeatherData() {}
-
-    public int getDataID() {
-        return dataID;
-    }
 
     public String getCityName() {
         return cityName;

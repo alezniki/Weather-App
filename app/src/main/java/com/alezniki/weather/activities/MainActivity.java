@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.alezniki.weather.R;
-import com.alezniki.weather.WeatherAdapter;
+import com.alezniki.weather.adapters.WeatherAdapter;
 import com.alezniki.weather.model.WeatherData;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         enableLocation();
 
         if (!isNetworkConnected()) {
-            Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             checkNetworkDialog();
         }
 
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity
                 .build();
     }
 
-    public void refreshUI() {
+    private void refreshUI() {
         list.add(wd);
         adapter.notifyDataSetChanged(); // // Refresh data
     }

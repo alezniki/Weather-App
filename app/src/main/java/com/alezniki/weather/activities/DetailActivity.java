@@ -2,69 +2,46 @@ package com.alezniki.weather.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.alezniki.weather.R;
+import com.alezniki.weather.adapters.DetailWeatherAdapter;
 import com.alezniki.weather.model.WeatherData;
 
-import static com.alezniki.weather.WeatherAdapter.KEY_ID;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.alezniki.weather.adapters.WeatherAdapter.KEY_ID;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private TextView tvCity;
-    private TextView tvDate;
-    private TextView tvMorningTemp;
-    private TextView tvDayTemp;
-    private TextView tvEveningTemp;
-    private TextView tvNightTemp;
-    private TextView tvPressure;
-    private TextView tvHumidity;
-    private TextView tvWeather;
-    private TextView tvClouds;
-    private TextView tvWind;
+    private DetailWeatherAdapter adapter;
+    private ListView listView;
+    private List<WeatherData> list;
 
-    WeatherData wd;
+    private WeatherData wd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        tvCity = (TextView) findViewById(R.id.tv_detail_city);
-        tvDate = (TextView) findViewById(R.id.tv_detail_date);
-        tvMorningTemp = (TextView) findViewById(R.id.tv_detail_morning_temp);
-        tvDayTemp = (TextView) findViewById(R.id.tv_detail_day_temp);
-        tvEveningTemp = (TextView) findViewById(R.id.tv_detail_evening_temp);
-        tvNightTemp = (TextView) findViewById(R.id.tv_detail_night_temp);
-        tvPressure = (TextView) findViewById(R.id.tv_detail_pressure);
-        tvHumidity = (TextView) findViewById(R.id.tv_detail_humidity);
-        tvWeather = (TextView) findViewById(R.id.tv_detail_weather);
-        tvClouds = (TextView) findViewById(R.id.tv_detail_clouds);
-        tvWind = (TextView) findViewById(R.id.tv_detail_wind);
+        // Receive the object that which has been sent through Intent from MainActivity
+        wd = (WeatherData) getIntent().getSerializableExtra(KEY_ID);
 
+        // Construct data source
+        list = new ArrayList<>();
+         // Create the adapter to convert array to views
+        adapter = new DetailWeatherAdapter(this, list);
+        // Attach the adapter to a listView and set adapter
+        listView = (ListView) findViewById(R.id.lv_detail_list_items);
+        listView.setAdapter(adapter);
 
-        //Receive the object that which has been sent through Intent from MainActivity
-        WeatherData wd = (WeatherData) getIntent().getSerializableExtra(KEY_ID);
-        loadWeatherData(wd);
-
+        list.add(wd);
+        adapter.notifyDataSetChanged();
     }
 
-    private void loadWeatherData(WeatherData wd) {
-
-        tvCity.setText(wd.getCityName() + ", " + wd.getCountry());
-        tvDate.setText(wd.getDate());
-        tvMorningTemp.setText("Morning temperature: " + wd.getMorningTemp() + " ˚C");
-        tvDayTemp.setText("Day temperature: " + wd.getDayTemp()  + " ˚C");
-        tvEveningTemp.setText("Evening temperature: " + wd.getEveningTemp()  + " ˚C");
-        tvNightTemp.setText("Night temperature: " + wd.getNightTemp() + " ˚C");
-        tvPressure.setText("Pressure: " + wd.getPressure() + " hPa");
-        tvHumidity.setText("Humidity: " + wd.getHumidity() + " %");
-        tvWeather.setText("Weather: " + wd.getMainWeather() + "(" + wd.getWeatherDescription() + ")");
-        tvClouds.setText("Cloudiness: " + wd.getClouds() + " %");
-        tvWind.setText("Wind: " + windDirectionDescription(wd.getWindDirection()) + ", " + wd.getWindSpeed() + " m/s");
-    }
-
-    private String windDirectionDescription(int degree) {
+    public String windDirectionDescription(int degree) {
         if (degree > 337.5) return "North";
         if (degree > 292.5) return "Northwest";
         if (degree > 247.5) return "West";
