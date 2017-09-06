@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="network_dialog_title">No Internet Connection</string>
+    <string name="network_dialog_message">Check your network settings and try again</string>
+    <string name="network_dialog_button_close">Close</string>
+    <string name="snackbar_message_location">Please enable location</string>
+    <string name="snackbar_action_location">Enable</string>
+    <string name="snackbar_message_permission">This app needs permission to access your location</string>
+    <string name="snackbar_action_permission">Request</string>
+    <string name="toast_location_services">Please Enable Location Services Permission</string>
+</resources>

@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.alezniki.weather.R;
-import com.alezniki.weather.activities.DetailActivity;
 import com.alezniki.weather.model.WeatherData;
 
 import java.util.List;
@@ -18,8 +17,6 @@ import java.util.List;
  */
 
 public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
-
-    private DetailActivity detailActivity = new DetailActivity();
 
     public DetailWeatherAdapter(Context context, List<WeatherData> list) {
         super(context, 0, list);
@@ -89,10 +86,22 @@ public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
         viewHolder.tvHumidity.setText("Humidity: " + pos.getHumidity() + " %");
         viewHolder.tvWeather.setText("Weather: " + pos.getMainWeather() + "(" + pos.getWeatherDescription() + ")");
         viewHolder.tvClouds.setText("Cloudiness: " + pos.getClouds() + " %");
-        viewHolder.tvWind.setText("Wind: " + detailActivity.windDirectionDescription(pos.getWindDirection()) + ", " + pos.getWindSpeed() + " m/s");
+        viewHolder.tvWind.setText("Wind: " + windDirectionDescription(pos.getWindDirection()) + ", " + pos.getWindSpeed() + " m/s");
 
         return convertView;
         // Return the completed convertView to render on screen
     }
 
+    private String windDirectionDescription(int degree) {
+        if (degree > 337.5) return "North";
+        if (degree > 292.5) return "Northwest";
+        if (degree > 247.5) return "West";
+        if (degree > 202.5) return "Southwest";
+        if (degree > 157.5) return "South";
+        if (degree > 122.5) return "SouthEast";
+        if (degree > 67.5)  return "East";
+        if (degree > 22.5) return "Northeast";
+
+        return "North";
+    }
 }

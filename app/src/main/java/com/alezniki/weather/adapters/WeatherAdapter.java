@@ -129,10 +129,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
 
-//    public void addDataToAdapter(List<WeatherData> dataList) {
-//        this.list.addAll(dataList);
-//        this.notifyItemRangeInserted(0, list.size() - 1);
-//    }
+    public void addDataToAdapter(List<WeatherData> dataList) {
+        this.list.addAll(dataList);
+        this.notifyItemRangeInserted(0, list.size() - 1);
+    }
 
     public void clearDataFromAdapter() {
         int listSize = this.list.size();

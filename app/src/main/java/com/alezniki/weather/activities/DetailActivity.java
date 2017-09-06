@@ -19,7 +19,7 @@ public class DetailActivity extends AppCompatActivity {
     private ListView listView;
     private List<WeatherData> list;
 
-    private WeatherData wd;
+    private WeatherData weatherData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         // Receive the object that which has been sent through Intent from MainActivity
-        wd = (WeatherData) getIntent().getSerializableExtra(KEY_ID);
+        weatherData = (WeatherData) getIntent().getSerializableExtra(KEY_ID);
 
         // Construct data source
         list = new ArrayList<>();
@@ -37,20 +37,7 @@ public class DetailActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.lv_detail_list_items);
         listView.setAdapter(adapter);
 
-        list.add(wd);
+        list.add(weatherData);
         adapter.notifyDataSetChanged();
-    }
-
-    public String windDirectionDescription(int degree) {
-        if (degree > 337.5) return "North";
-        if (degree > 292.5) return "Northwest";
-        if (degree > 247.5) return "West";
-        if (degree > 202.5) return "Southwest";
-        if (degree > 157.5) return "South";
-        if (degree > 122.5) return "SouthEast";
-        if (degree > 67.5)  return "East";
-        if (degree > 22.5)  return "Northeast";
-
-        return "North";
     }
 }

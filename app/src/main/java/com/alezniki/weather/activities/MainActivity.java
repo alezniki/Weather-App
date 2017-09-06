@@ -2,19 +2,21 @@ package com.alezniki.weather.activities;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.alezniki.weather.NetworkConnectionReceiver;
 import com.alezniki.weather.R;
 import com.alezniki.weather.adapters.WeatherAdapter;
 import com.alezniki.weather.model.WeatherData;
@@ -47,13 +50,13 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-       implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
+        implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
     // RequestQueue : 16 day weather forecast
     public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
     public static final String URL_COORDINATES = "?lat="; // ?lat=41.890251&lon=12.492373"; // Colosseum Rome
     public static final String URL_UNITS = "&units=metric";
-    public static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
+    public static final String URL_API_KEY = "&APPID=cbda7fd332fd54982669ad4eb3fa527b";
 
     // Use Google API builder
     private GoogleApiClient googleApiClient;
@@ -67,6 +70,9 @@ public class MainActivity extends AppCompatActivity
     // Weather Data
     private WeatherData wd;
     private List<WeatherData> list;
+
+    //    private NetworkConnection connection;
+    private NetworkConnectionReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,25 +94,41 @@ public class MainActivity extends AppCompatActivity
         recycler.setAdapter(adapter);
 
         googleAPI();
+
+//        connection = new NetworkConnection(this);
+        receiver = new NetworkConnectionReceiver();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (adapter != null && recycler != null) {
+        if (recycler != null && adapter != null) {
             adapter.clearDataFromAdapter();
+
+            adapter.addDataToAdapter(list);
+            adapter.notifyDataSetChanged();
         }
 
         enableLocation();
 
-        if (!isNetworkConnected()) {
-            // Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
-            checkNetworkDialog();
-        }
+        IntentFilter customFilter = new IntentFilter(NetworkConnectionReceiver.NOTIFY_NETWORK_CHANGE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(localReceiver, customFilter);
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(receiver, filter);
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Unregister Broadcast Receiver
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+        }
+    }
 
     public void downloadWeatherData(Location location) {
 
@@ -144,8 +166,6 @@ public class MainActivity extends AppCompatActivity
                                 // Grab the main object {} inside upper object from List array
                                 JSONObject tempObject = listObject.getJSONObject("temp");
                                 double dayTemp = tempObject.getDouble("day"); // Daily averaged temperature
-                                double minTemp = tempObject.getDouble("min"); // Min daily temperature
-                                double maxTemp = tempObject.getDouble("max"); // Max daily temperature
                                 double nightTemp = tempObject.getDouble("night"); // Night temperature
                                 double eveningTemp = tempObject.getDouble("eve"); // Evening temperature
                                 double morningTemp = tempObject.getDouble("morn"); // Morning temperature
@@ -153,57 +173,26 @@ public class MainActivity extends AppCompatActivity
                                 double pressure = listObject.getDouble("pressure"); // Atmospheric pressure hPa
                                 int humidity = listObject.getInt("humidity"); // Humidity %
 
-                                Log.v("TAG", "MAIN: Day: " + dayTemp + " ˚C, Min: " + minTemp
-                                        + "˚C, Max:" + maxTemp + " ˚C, Night: " + nightTemp
-                                        + "˚C, Evening:" + eveningTemp + " ˚C, Morning: "
-                                        + morningTemp + " ˚C, Pressure: " + pressure
-                                        + " hPa, Humidity: " + humidity + "%");
-
                                 // Grab the weather array [] which is at the same level as main object, inside list object
                                 JSONArray weatherArray = listObject.getJSONArray("weather");
                                 JSONObject weatherObject = weatherArray.getJSONObject(0);// Index range [0..1)
                                 String mainWeather = weatherObject.getString("main");
                                 String weatherDescription = weatherObject.getString("description");
 
-                                Log.v("TAG", "WEATHER: Parameter: " + mainWeather + ", Condition: " + weatherDescription);
-
                                 // Grab the clouds object {}, on the same list level
                                 int clouds = listObject.getInt("clouds"); // Cloudiness %
-
-                                Log.v("TAG", "CLOUDS: " + clouds + " %");
 
                                 // Grab the wind object {}, on the same list level
                                 double windSpeed = listObject.getDouble("speed"); // Wind speed degrees
                                 double windDirection = listObject.getDouble("deg"); // Wind direction degrees
 
-                                Log.v("TAG", "WIND: Speed: " + windSpeed + " meter/sec, Direction: " + windDirection + "deg");
-
                                 // Grab date  String from List Object
                                 int rawDate = listObject.getInt("dt");
-                                Log.v("TAG", "RAW DATE: " + rawDate);
 
                                 String date = new SimpleDateFormat("yyyy-MM-dd")
                                         .format(new Date(rawDate * 1000L));
-                                Log.v("TAG", "DATE: " + date);
 
-                                wd = new WeatherData();
-                                wd.setCityName(cityName);
-                                wd.setCountry(country);
-                                wd.setDayTemp((int) dayTemp);
-                                wd.setMinTemp((int) minTemp);
-                                wd.setMaxTemp((int) maxTemp);
-                                wd.setNightTemp((int) nightTemp);
-                                wd.setEveningTemp((int) eveningTemp);
-                                wd.setMorningTemp((int) morningTemp);
-                                wd.setPressure((int) pressure);
-                                wd.setHumidity(humidity);
-                                wd.setMainWeather(mainWeather);
-                                wd.setWeatherDescription(weatherDescription);
-                                wd.setClouds(clouds);
-                                wd.setWindSpeed((int) windSpeed);
-                                wd.setWindDirection((int) windDirection);
-                                wd.setDate(date);
-
+                                wd = new WeatherData(cityName, country, dayTemp, nightTemp, eveningTemp, morningTemp, pressure, humidity, mainWeather, weatherDescription, clouds, windSpeed, windDirection, date);
                                 refreshUI();
 
                             }
@@ -214,8 +203,9 @@ public class MainActivity extends AppCompatActivity
                     }
                 }, new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.v("TAG", "RESPONSE ERROR: " + error.getLocalizedMessage());
+                    public void onErrorResponse(VolleyError e) {
+                        e.printStackTrace();
+                        Log.v("TAG", "RESPONSE ERROR: " + e.getLocalizedMessage());
 
                     }
                 });
@@ -249,8 +239,8 @@ public class MainActivity extends AppCompatActivity
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Snackbar snack = Snackbar.make(findViewById(R.id.recycler), "Please enable location", Snackbar.LENGTH_INDEFINITE);
-            snack.setAction("Enable", new View.OnClickListener() {
+            Snackbar snack = Snackbar.make(findViewById(R.id.recycler), R.string.snackbar_message_location, Snackbar.LENGTH_INDEFINITE);
+            snack.setAction(R.string.snackbar_action_location, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
@@ -303,7 +293,7 @@ public class MainActivity extends AppCompatActivity
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
             Log.v("TAG", "Requesting Location Updates");
         } catch (SecurityException exception) {
-            Toast.makeText(this, "Please Enable Location Services Permission", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.toast_location_services, Toast.LENGTH_LONG).show();
             Log.v("TAG", exception.toString());
         }
     }
@@ -323,14 +313,13 @@ public class MainActivity extends AppCompatActivity
 
                 Log.v("TAG", "Permission Granted - Starting Services");
             } else {
-                // if its not been granted show a dialog to a user requesting that GPS be enabled
+                // if its not been granted show notification to user to enable location
                 Log.v("TAG", "Permission Not Granted");
-                Toast.makeText(this, "Weather can't run your location because you denied permission", Toast.LENGTH_LONG).show();
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                    Snackbar snack = Snackbar.make(findViewById(R.id.recycler), "Allow Permission", Snackbar.LENGTH_INDEFINITE);
-                    snack.setAction("Request", new View.OnClickListener() {
+                    Snackbar snack = Snackbar.make(findViewById(R.id.recycler), R.string.snackbar_message_permission, Snackbar.LENGTH_LONG);
+                    snack.setAction(R.string.snackbar_action_permission, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             checkAndRequestPermissions();
@@ -361,33 +350,40 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    // Checking the Network Connection
-    private boolean isNetworkConnected() {
+    // Broadcast Receiver to refresh UI when connected back to network
+    private BroadcastReceiver localReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected =
+                    intent.getBooleanExtra(NetworkConnectionReceiver.EXTRA_IS_CONNECTED, false);
 
-        // 1. Retrieves an instance of the ConnectivityManager class from the current application context.
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (!isConnected) {
+                // Show snack bar to the user if there is no internet connection
+                Snackbar snack = Snackbar.make(findViewById(R.id.recycler), "No Internet connection, go to network settings", Snackbar.LENGTH_INDEFINITE);
+                snack.setAction("Connect", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
 
-        // 2.Retrieves an instance of the NetworkInfo class that represents the current network connection.
-        // This will be null if no network is available.
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                    }
+                });
 
-        // 3. Check if there is an available network connection and the device is connected.
-        // Should check null because in airplane mode it will be null
-        return networkInfo != null && networkInfo.isConnected();
-    }
+                snack.show();
+            }
+        }
+    };
 
-    // Show dialog to the user if there is no internet connection
-    private void checkNetworkDialog() {
+    // Show snack bar to the user if there is no internet connection
+    public void checkNetworkDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("No Internet Connection");
-        builder.setMessage("Check your network settings and try again");
+        builder.setTitle(R.string.network_dialog_title);
+        builder.setMessage(R.string.network_dialog_message);
 
-        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.network_dialog_button_close, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
                 dialog.dismiss();
             }
         });
@@ -396,5 +392,4 @@ public class MainActivity extends AppCompatActivity
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
     }
-
 }

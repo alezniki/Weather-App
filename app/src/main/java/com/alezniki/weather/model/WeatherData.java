@@ -20,8 +20,6 @@ public class WeatherData implements Serializable {
     private String country;
     // Temperature
     private int dayTemp;
-    private int minTemp;
-    private int maxTemp;
     private int nightTemp;
     private int eveningTemp;
     private int morningTemp;
@@ -37,133 +35,145 @@ public class WeatherData implements Serializable {
     // Date String
     private String date;
 
-    public WeatherData() {}
+    public WeatherData(String cityName, String country, double dayTemp, double nightTemp, double eveningTemp, double morningTemp, double pressure, int humidity, String mainWeather, String weatherDescription, int clouds, double windSpeed, double windDirection, String date) {
+        this.cityName = cityName;
+        this.country = country;
+        this.dayTemp = (int) dayTemp;
+        this.nightTemp = (int) nightTemp;
+        this.eveningTemp = (int) eveningTemp;
+        this.morningTemp = (int) morningTemp;
+        this.pressure = (int) pressure;
+        this.humidity = humidity;
+        this.mainWeather = mainWeather;
+        this.weatherDescription = weatherDescription;
+        this.clouds = clouds;
+        this.windSpeed = (int) windSpeed;
+        this.windDirection = (int) windDirection;
+        this.date = date;
+    }
 
+    /**
+     * Get City Name
+     *
+     * @return cityName
+     */
     public String getCityName() {
         return cityName;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
-    }
-
+    /**
+     * Get Country
+     *
+     * @return country
+     */
     public String getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
+    /**
+     * Get Day Temp
+     *
+     * @return dayTemp
+     */
     public int getDayTemp() {
         return dayTemp;
     }
 
-    public void setDayTemp(int dayTemp) {
-        this.dayTemp = dayTemp;
-    }
-
-    public int getMinTemp() {
-        return minTemp;
-    }
-
-    public void setMinTemp(int minTemp) {
-        this.minTemp = minTemp;
-    }
-
-    public int getMaxTemp() {
-        return maxTemp;
-    }
-
-    public void setMaxTemp(int maxTemp) {
-        this.maxTemp = maxTemp;
-    }
-
+    /**
+     * Get Night Temp
+     *
+     * @return nightTemp
+     */
     public int getNightTemp() {
         return nightTemp;
     }
 
-    public void setNightTemp(int nightTemp) {
-        this.nightTemp = nightTemp;
-    }
-
+    /**
+     * Get Evening Temp
+     *
+     * @return eveningTemp
+     */
     public int getEveningTemp() {
         return eveningTemp;
     }
 
-    public void setEveningTemp(int eveningTemp) {
-        this.eveningTemp = eveningTemp;
-    }
-
+    /**
+     * Get Morning Temp
+     *
+     * @return morningTemp
+     */
     public int getMorningTemp() {
         return morningTemp;
     }
 
-    public void setMorningTemp(int morningTemp) {
-        this.morningTemp = morningTemp;
-    }
-
+    /**
+     * Get Pressure
+     *
+     * @return pressure
+     */
     public int getPressure() {
         return pressure;
     }
 
-    public void setPressure(int pressure) {
-        this.pressure = pressure;
-    }
-
+    /**
+     * Get Humidity
+     *
+     * @return humidity
+     */
     public int getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(int humidity) {
-        this.humidity = humidity;
-    }
-
+    /**
+     * Get Main Weather
+     *
+     * @return mainWeather
+     */
     public String getMainWeather() {
         return mainWeather;
     }
 
-    public void setMainWeather(String mainWeather) {
-        this.mainWeather = mainWeather;
-    }
-
+    /**
+     * Get Weather Description
+     * @return WeatherDescription
+     */
     public String getWeatherDescription() {
         return weatherDescription;
     }
 
-    public void setWeatherDescription(String weatherDescription) {
-        this.weatherDescription = weatherDescription;
-    }
-
+    /**
+     * Get Clouds
+     *
+     * @return clouds
+     */
     public int getClouds() {
         return clouds;
     }
 
-    public void setClouds(int clouds) {
-        this.clouds = clouds;
-    }
-
+    /**
+     * Get Wind Speed
+     *
+     * @return windSpeed
+     */
     public int getWindSpeed() {
         return windSpeed;
     }
 
-    public void setWindSpeed(int windSpeed) {
-        this.windSpeed = windSpeed;
-    }
-
+    /**
+     * Get Wind Direction
+     *
+     * @return windDirection
+     */
     public int getWindDirection() {
         return windDirection;
     }
 
-    public void setWindDirection(int windDirection) {
-        this.windDirection = windDirection;
-    }
-
+    /**
+     * Get Date
+     *
+     * @return date
+     */
     public String getDate() {
         return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 }
