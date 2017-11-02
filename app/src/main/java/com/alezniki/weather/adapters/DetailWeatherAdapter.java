@@ -48,13 +48,12 @@ public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // return super.getView(position, convertView, parent);
-
         // Get the WeatherData item fot this position
         final WeatherData weatherData = getItem(position);
 
         // Check if an existing convertView is being reused, otherwise inflate the viewHolder
-        ViewHolder viewHolder; // view lookup cache stored in tag
+        // view lookup cache stored in tag
+        ViewHolder viewHolder;
 
         if (convertView == null) {
             viewHolder = new ViewHolder();

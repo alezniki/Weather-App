@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
+
     }
 
     @Override
@@ -253,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 @Override
                 public void onClick(View v) {
                     startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
                 }
             });
 
@@ -278,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             System.out.println("############### Starting Location Services From onConnected");
         }
     }
-
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
