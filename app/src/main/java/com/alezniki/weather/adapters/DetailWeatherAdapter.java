@@ -13,11 +13,19 @@ import com.alezniki.weather.model.WeatherData;
 import java.util.List;
 
 /**
+ * Detail Weather Adapter
+ * <p>
  * Created by nikola on 7/26/17.
  */
-
+@SuppressWarnings("ALL")
 public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
 
+    /**
+     * Constructor
+     *
+     * @param context context
+     * @param list    weather data list
+     */
     public DetailWeatherAdapter(Context context, List<WeatherData> list) {
         super(context, 0, list);
     }
@@ -43,7 +51,7 @@ public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
         // return super.getView(position, convertView, parent);
 
         // Get the WeatherData item fot this position
-        final WeatherData pos = getItem(position);
+        final WeatherData weatherData = getItem(position);
 
         // Check if an existing convertView is being reused, otherwise inflate the viewHolder
         ViewHolder viewHolder; // view lookup cache stored in tag
@@ -75,23 +83,31 @@ public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
         }
 
         // Populate the data from the data object via the viewHolder object into the template convertView
-        assert pos != null;
-        viewHolder.tvCity.setText(pos.getCityName() + ", " + pos.getCountry());
-        viewHolder.tvDate.setText(pos.getDate());
-        viewHolder.tvMorningTemp.setText("Morning temperature: " + pos.getMorningTemp() + " ˚C");
-        viewHolder.tvDayTemp.setText("Day temperature: " + pos.getDayTemp()  + " ˚C");
-        viewHolder.tvEveningTemp.setText("Evening temperature: " + pos.getEveningTemp()  + " ˚C");
-        viewHolder.tvNightTemp.setText("Night temperature: " + pos.getNightTemp() + " ˚C");
-        viewHolder.tvPressure.setText("Pressure: " + pos.getPressure() + " hPa");
-        viewHolder.tvHumidity.setText("Humidity: " + pos.getHumidity() + " %");
-        viewHolder.tvWeather.setText("Weather: " + pos.getMainWeather() + "(" + pos.getWeatherDescription() + ")");
-        viewHolder.tvClouds.setText("Cloudiness: " + pos.getClouds() + " %");
-        viewHolder.tvWind.setText("Wind: " + windDirectionDescription(pos.getWindDirection()) + ", " + pos.getWindSpeed() + " m/s");
+        assert weatherData != null;
+        viewHolder.tvCity.setText(weatherData.getCityName() + ", " + weatherData.getCountry());
+        viewHolder.tvDate.setText(weatherData.getDate());
+        viewHolder.tvMorningTemp.setText("Morning temperature: " + weatherData.getMorningTemp() + " ˚C");
+        viewHolder.tvDayTemp.setText("Day temperature: " + weatherData.getDayTemp() + " ˚C");
+        viewHolder.tvEveningTemp.setText("Evening temperature: " + weatherData.getEveningTemp() + " ˚C");
+        viewHolder.tvNightTemp.setText("Night temperature: " + weatherData.getNightTemp() + " ˚C");
+        viewHolder.tvPressure.setText("Pressure: " + weatherData.getPressure() + " hPa");
+        viewHolder.tvHumidity.setText("Humidity: " + weatherData.getHumidity() + " %");
+        viewHolder.tvWeather.setText("Weather: " + weatherData.getMainWeather() + "(" + weatherData.getWeatherDescription() + ")");
+        viewHolder.tvClouds.setText("Cloudiness: " + weatherData.getClouds() + " %");
+        viewHolder.tvWind.setText("Wind: " + windDirectionDescription(weatherData.getWindDirection()) + ", " + weatherData.getWindSpeed() + " m/s");
 
-        return convertView;
         // Return the completed convertView to render on screen
+        return convertView;
     }
 
+    /**
+     * Wind Direction Description
+     * Return wind description based on giver wind direction
+     *
+     * @param degree weather degree
+     * @return wind direction
+     */
+    @SuppressWarnings("JavaDoc")
     private String windDirectionDescription(int degree) {
         if (degree > 337.5) return "North";
         if (degree > 292.5) return "Northwest";
@@ -99,7 +115,7 @@ public class DetailWeatherAdapter extends ArrayAdapter<WeatherData> {
         if (degree > 202.5) return "Southwest";
         if (degree > 157.5) return "South";
         if (degree > 122.5) return "SouthEast";
-        if (degree > 67.5)  return "East";
+        if (degree > 67.5) return "East";
         if (degree > 22.5) return "Northeast";
 
         return "North";

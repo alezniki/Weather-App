@@ -1,6 +1,7 @@
 package com.alezniki.weather.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -49,29 +50,29 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
+@SuppressWarnings("ALL")
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
     // RequestQueue : 16 day weather forecast
-    public static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
-    public static final String URL_COORDINATES = "?lat="; // ?lat=41.890251&lon=12.492373"; // Colosseum Rome
-    public static final String URL_UNITS = "&units=metric";
-    public static final String URL_API_KEY = "&APPID=cbda7fd332fd54982669ad4eb3fa527b";
+    private static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
+    private static final String URL_COORDINATES = "?lat=";
+    private static final String URL_UNITS = "&units=metric";
+    private static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
 
     // Use Google API builder
     private GoogleApiClient googleApiClient;
     private final int PERMISSION_LOCATION = 1;
 
-    // RecyclerView
+    // RecyclerView, Adapter, LayoutManager
     private WeatherAdapter adapter;
     private RecyclerView recycler;
     private RecyclerView.LayoutManager layoutManager;
 
     // Weather Data
-    private WeatherData wd;
+    private WeatherData weatherData;
     private List<WeatherData> list;
 
-    //    private NetworkConnection connection;
+    // Network connection receiver
     private NetworkConnectionReceiver receiver;
 
     @Override
@@ -86,16 +87,16 @@ public class MainActivity extends AppCompatActivity
 
         // 1. Improve RecyclerView performance
         recycler.setHasFixedSize(true);
+
         // 2. Use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recycler.setLayoutManager(layoutManager);
+
         //3. Create the adapter to convert the array to views
         adapter = new WeatherAdapter(list, this);
         recycler.setAdapter(adapter);
 
         googleAPI();
-
-//        connection = new NetworkConnection(this);
         receiver = new NetworkConnectionReceiver();
     }
 
@@ -117,7 +118,6 @@ public class MainActivity extends AppCompatActivity
 
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
-
     }
 
     @Override
@@ -130,7 +130,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void downloadWeatherData(Location location) {
+    /**
+     * Download Weather Data
+     *
+     * @param location location
+     */
+    private void downloadWeatherData(Location location) {
 
         // Full Latitude and Longitude GPS Coordinates
         final String latLon = URL_COORDINATES + location.getLatitude() + "&lon=" + location.getLongitude();
@@ -143,8 +148,6 @@ public class MainActivity extends AppCompatActivity
                 new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.v("TAG", "RESPONSE: " + response.toString());
-
                         try {
                             // Grab the name and country from City Object {}
                             JSONObject cityObject = response.getJSONObject("city");
@@ -157,9 +160,9 @@ public class MainActivity extends AppCompatActivity
                             JSONArray listArray = response.getJSONArray("list");
 
                             // Do the for loop to get items number
-                            int cnt = 7; // Number of lines returned by this API call
+                            int count = 7; // Number of lines returned by this API call
 
-                            for (int i = 0; i < cnt; i++) {
+                            for (int i = 0; i < count; i++) {
 
                                 JSONObject listObject = listArray.getJSONObject(i);
 
@@ -189,24 +192,22 @@ public class MainActivity extends AppCompatActivity
                                 // Grab date  String from List Object
                                 int rawDate = listObject.getInt("dt");
 
-                                String date = new SimpleDateFormat("yyyy-MM-dd")
-                                        .format(new Date(rawDate * 1000L));
+                                @SuppressLint("SimpleDateFormat")
+                                String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date(rawDate * 1000L));
 
-                                wd = new WeatherData(cityName, country, dayTemp, nightTemp, eveningTemp, morningTemp, pressure, humidity, mainWeather, weatherDescription, clouds, windSpeed, windDirection, date);
+                                weatherData = new WeatherData(cityName, country, dayTemp, nightTemp, eveningTemp, morningTemp, pressure, humidity, mainWeather, weatherDescription, clouds, windSpeed, windDirection, date);
                                 refreshUI();
-
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Log.v("TAG", "JSON ERROR: " + e.getLocalizedMessage());
+                            System.out.println("JSON ERROR: " + e.getLocalizedMessage());
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError e) {
                         e.printStackTrace();
-                        Log.v("TAG", "RESPONSE ERROR: " + e.getLocalizedMessage());
-
+                        System.out.println("RESPONSE ERROR: " + e.getLocalizedMessage());
                     }
                 });
 
@@ -215,11 +216,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Google API
+     * <p>
      * .enableAutoManage(FragmentActivity, OnConnectionFailedListener)
      * Enables automatic lifecycle management in a support library FragmentActivity
      * that connects the client in onStart() and disconnects it in onStop().
      */
-    public void googleAPI() {
+    private void googleAPI() {
         // Build Our Google Client
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)  // Use location services API to get user location
@@ -229,11 +232,17 @@ public class MainActivity extends AppCompatActivity
                 .build();
     }
 
+    /**
+     * Refresh UI data
+     */
     private void refreshUI() {
-        list.add(wd);
-        adapter.notifyDataSetChanged(); // // Refresh data
+        list.add(weatherData);
+        adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Enable Location
+     */
     private void enableLocation() {
         // Make sure that GPS is enabled on the device
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -244,14 +253,12 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick(View v) {
                     startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-
                 }
             });
 
             snack.show();
         }
     }
-
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -261,15 +268,14 @@ public class MainActivity extends AppCompatActivity
     // Called when Google services are connected
     @Override
     public void onConnected(Bundle bundle) {
-
-        // If the user is not giving permission to use location we need to request those permissions
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // If the user is not giving permission to use location we need to request those permissions
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
-            Log.v("TAG", "Requesting Permissions");
+            System.out.println("############### Request Permissions For Location Services");
         } else {
             // Start location services if the permission has already been given
-            Log.v("TAG", "Starting Location Services From onConnected");
             startLocationServices();
+            System.out.println("############### Starting Location Services From onConnected");
         }
     }
 
@@ -283,100 +289,97 @@ public class MainActivity extends AppCompatActivity
     public void onLocationChanged(Location location) {
         // Called whenever location is changed, work with location itself
         downloadWeatherData(location);
-
     }
 
-    public void startLocationServices() {
-        Log.v("TAG", "Starting Location Services Called");
+    /**
+     * Start Location Services
+     */
+    private void startLocationServices() {
+        System.out.println("############### Starting Location Services Called");
         try {
             LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_LOW_POWER);
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-            Log.v("TAG", "Requesting Location Updates");
+            System.out.println("############### Requesting Location Updates");
         } catch (SecurityException exception) {
             Toast.makeText(this, R.string.toast_location_services, Toast.LENGTH_LONG).show();
             Log.v("TAG", exception.toString());
         }
     }
 
-    // Request permission which is going to call onRequestPermissionsResult
-    // Throw a popup for user to give permission and grab permission from grantResults in switch statement
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        // grantResults: the results of the permissions being granted
+        /*Request permission which is going to call onRequestPermissionsResult
+        Throw a popup for user to give permission and grab permission from grantResults in switch statement
+        grantResults: the results of the permissions being granted*/
+
         if (requestCode == PERMISSION_LOCATION) {
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                System.out.println("############### Permission Granted - Starting Services");
+
                 // if more than zero permissions have been granted then we grab the first one and if permission  is granted we start location services
                 startLocationServices();
-
-                Log.v("TAG", "Permission Granted - Starting Services");
             } else {
+                System.out.println("############### Permission Not Granted");
+
                 // if its not been granted show notification to user to enable location
-                Log.v("TAG", "Permission Not Granted");
-
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-
                     Snackbar snack = Snackbar.make(findViewById(R.id.recycler), R.string.snackbar_message_permission, Snackbar.LENGTH_LONG);
                     snack.setAction(R.string.snackbar_action_permission, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             checkAndRequestPermissions();
-
                         }
                     });
+
                     snack.show();
                 }
-
             }
         }
     }
 
-
-    // Check if user denied location and request permission
-    private boolean checkAndRequestPermissions() {
+    /**
+     * Check And Request Permissions
+     * <p>
+     * Check if user denied location and request permission
+     *
+     * @return permission
+     */
+    private void checkAndRequestPermissions() {
         int locationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         List<String> listPermissionsNeeded = new ArrayList<>();
 
         if (locationPermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
+
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), 1);
-            return false;
+            return;
         }
-        return true;
     }
 
-
     // Broadcast Receiver to refresh UI when connected back to network
-    private BroadcastReceiver localReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver localReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean isConnected =
-                    intent.getBooleanExtra(NetworkConnectionReceiver.EXTRA_IS_CONNECTED, false);
+            boolean isConnected = intent.getBooleanExtra(NetworkConnectionReceiver.EXTRA_IS_CONNECTED, true);
 
             if (!isConnected) {
-                // Show snack bar to the user if there is no internet connection
-                Snackbar snack = Snackbar.make(findViewById(R.id.recycler), "No Internet connection, go to network settings", Snackbar.LENGTH_INDEFINITE);
-                snack.setAction("Connect", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-
-                    }
-                });
-
-                snack.show();
+                checkNetworkDialog();
             }
         }
     };
 
-    // Show snack bar to the user if there is no internet connection
+    /**
+     * Check Network Dialog
+     * <p>
+     * Show dialog to the user if there is no internet connection
+     */
     public void checkNetworkDialog() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.network_dialog_title);
         builder.setMessage(R.string.network_dialog_message);
 
