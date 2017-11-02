@@ -5,18 +5,30 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 /**
+ * Network Connection
+ * <p>
  * Created by nikola on 7/30/17.
  */
+class NetworkConnection {
 
-public class NetworkConnection {
+    private final Context context;
 
-    private Context context;
-
+    /**
+     * Constructor
+     *
+     * @param context context
+     */
     public NetworkConnection(Context context) {
         this.context = context;
     }
 
-    // Checking the Network NetworkConnection
+    /**
+     * Is Network Connected
+     * <p>
+     * Checking the Network NetworkConnection
+     *
+     * @return network info
+     */
     public boolean isNetworkConnected() {
 
         // 1. Retrieves an instance of the ConnectivityManager class from the current application context.
