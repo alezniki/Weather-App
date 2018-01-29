@@ -22,7 +22,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -50,50 +49,97 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Main activity
+ * <p>
+ * RequestQueue: 16 day weather forecast
+ *
+ * @author Nikola Aleksic
+ */
 @SuppressWarnings("ALL")
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
-    // RequestQueue : 16 day weather forecast
+    /**
+     * Url base
+     */
     private static final String URL_BASE = "http://api.openweathermap.org/data/2.5/forecast/daily";
+
+    /**
+     * Url coordinates
+     */
     private static final String URL_COORDINATES = "?lat=";
+
+    /**
+     * Url units
+     */
     private static final String URL_UNITS = "&units=metric";
+
+    /**
+     * Url api key
+     */
     private static final String URL_API_KEY = "&APPID=YOUR_API_KEY_HERE";
 
-    // Use Google API builder
+    /**
+     * Google api client
+     */
     private GoogleApiClient googleApiClient;
-    private final int PERMISSION_LOCATION = 1;
 
-    // RecyclerView, Adapter, LayoutManager
+    /**
+     * Permission location
+     */
+    private static final int PERMISSION_LOCATION = 1;
+
+    /**
+     * Weather adapter
+     */
     private WeatherAdapter adapter;
+
+    /**
+     * Recycler view
+     */
     private RecyclerView recycler;
+
+    /**
+     * Layout manager
+     */
     private RecyclerView.LayoutManager layoutManager;
 
-    // Weather Data
+    /**
+     * Weather data
+     */
     private WeatherData weatherData;
-    private List<WeatherData> list;
 
-    // Network connection receiver
+    /**
+     * Weather data list
+     */
+    private List<WeatherData> weathers;
+
+    /**
+     * Network connection receiver
+     */
     private NetworkConnectionReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        // Construct the data source
-        list = new ArrayList<>();
-        // Create the adapter to convert the array to views
+        //Construct the data source
+        weathers = new ArrayList<>();
+
+        //Create the adapter to convert the array to views
         recycler = (RecyclerView) findViewById(R.id.recycler);
 
-        // 1. Improve RecyclerView performance
+        //1.Improve RecyclerView performance
         recycler.setHasFixedSize(true);
 
-        // 2. Use a linear layout manager
+        //2.Use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recycler.setLayoutManager(layoutManager);
 
-        //3. Create the adapter to convert the array to views
-        adapter = new WeatherAdapter(list, this);
+        //3.Create the adapter to convert the array to views
+        adapter = new WeatherAdapter(this, weathers);
         recycler.setAdapter(adapter);
 
         googleAPI();
@@ -107,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (recycler != null && adapter != null) {
             adapter.clearDataFromAdapter();
 
-            adapter.addDataToAdapter(list);
+            adapter.addDataToAdapter(weathers);
             adapter.notifyDataSetChanged();
         }
 
@@ -118,15 +164,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        // Unregister Broadcast Receiver
         if (receiver != null) {
+            //Unregister broadcast receiver
             unregisterReceiver(receiver);
         }
     }
@@ -138,59 +183,80 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
      */
     private void downloadWeatherData(Location location) {
 
-        // Full Latitude and Longitude GPS Coordinates
+        //Full Latitude and Longitude GPS Coordinates
         final String latLon = URL_COORDINATES + location.getLatitude() + "&lon=" + location.getLongitude();
 
-        // Request URL
+        //Request URL
         final String url = URL_BASE + latLon + URL_UNITS + URL_API_KEY;
 
-        // Volley Library
+        //Volley Library
         final JsonObjectRequest jsonRequest =
                 new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            // Grab the name and country from City Object {}
+                            //Grab the name and country from City Object {}
                             JSONObject cityObject = response.getJSONObject("city");
 
                             String cityName = cityObject.getString("name");
                             String country = cityObject.getString("country");
-                            Log.v("TAG", "City: " + cityName + ", Country: " + country);
+                            System.out.println("######## CITY: " + cityName + ", COUNTRY: " + country);
 
-                            // Grab data from List Array []
+                            //Grab data from List Array []
                             JSONArray listArray = response.getJSONArray("list");
 
-                            // Do the for loop to get items number
-                            int count = 7; // Number of lines returned by this API call
+                            //Do the for loop to get items number (counts returned by this API call)
+                            int count = 7;
 
                             for (int i = 0; i < count; i++) {
 
                                 JSONObject listObject = listArray.getJSONObject(i);
 
-                                // Grab the main object {} inside upper object from List array
+                                //Grab the main object {} inside upper object from List array
                                 JSONObject tempObject = listObject.getJSONObject("temp");
-                                double dayTemp = tempObject.getDouble("day"); // Daily averaged temperature
-                                double nightTemp = tempObject.getDouble("night"); // Night temperature
-                                double eveningTemp = tempObject.getDouble("eve"); // Evening temperature
-                                double morningTemp = tempObject.getDouble("morn"); // Morning temperature
 
-                                double pressure = listObject.getDouble("pressure"); // Atmospheric pressure hPa
-                                int humidity = listObject.getInt("humidity"); // Humidity %
+                                //Daily averaged temperature
+                                double dayTemp = tempObject.getDouble("day");
 
-                                // Grab the weather array [] which is at the same level as main object, inside list object
+                                //Night temperature
+                                double nightTemp = tempObject.getDouble("night");
+
+                                //Evening temperature
+                                double eveningTemp = tempObject.getDouble("eve");
+
+                                //Morning temperature
+                                double morningTemp = tempObject.getDouble("morn");
+
+                                //Atmospheric pressure hPa
+                                double pressure = listObject.getDouble("pressure");
+
+                                //Humidity %
+                                int humidity = listObject.getInt("humidity");
+
+                                //Grab the weather array [] which is at the same level as main object, inside list object
                                 JSONArray weatherArray = listObject.getJSONArray("weather");
-                                JSONObject weatherObject = weatherArray.getJSONObject(0);// Index range [0..1)
+
+                                //Index range [0..1)
+                                JSONObject weatherObject = weatherArray.getJSONObject(0);
+
+                                //Main weather
                                 String mainWeather = weatherObject.getString("main");
+
+                                //Weather description
                                 String weatherDescription = weatherObject.getString("description");
 
-                                // Grab the clouds object {}, on the same list level
-                                int clouds = listObject.getInt("clouds"); // Cloudiness %
+                                //Grab the clouds object {}, on the same list level
+                                //Cloudiness %
+                                int clouds = listObject.getInt("clouds");
 
-                                // Grab the wind object {}, on the same list level
-                                double windSpeed = listObject.getDouble("speed"); // Wind speed degrees
-                                double windDirection = listObject.getDouble("deg"); // Wind direction degrees
+                                //Grab the wind object {}, on the same list level
+                                //Wind speed degrees
+                                double windSpeed = listObject.getDouble("speed");
 
-                                // Grab date  String from List Object
+                                //Wind direction degrees
+                                double windDirection = listObject.getDouble("deg");
+
+                                //Grab date string from list object
                                 int rawDate = listObject.getInt("dt");
 
                                 @SuppressLint("SimpleDateFormat")
@@ -201,18 +267,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            System.out.println("JSON ERROR: " + e.getLocalizedMessage());
+                            System.out.println("######## JSON ERROR: " + e.getLocalizedMessage());
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError e) {
                         e.printStackTrace();
-                        System.out.println("RESPONSE ERROR: " + e.getLocalizedMessage());
+                        System.out.println("######## RESPONSE ERROR: " + e.getLocalizedMessage());
                     }
                 });
 
-        // Make the Volley request
+        //Make the Volley request
         Volley.newRequestQueue(this).add(jsonRequest);
     }
 
@@ -224,20 +290,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
      * that connects the client in onStart() and disconnects it in onStop().
      */
     private void googleAPI() {
-        // Build Our Google Client
+
+        //Build google client
         googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)  // Use location services API to get user location
-                .enableAutoManage(this, this) // Automatically manage without extra code
-                .addConnectionCallbacks(this) // Called when the client is connected or disconnected from the service
-                .addOnConnectionFailedListener(this) // Callbacks for failed attempt to connect client to the service
-                .build();
+
+                //Use location services API to get user location
+                .addApi(LocationServices.API)
+
+                //Automatically manage without extra code
+                .enableAutoManage(this, this)
+
+                //Called when the client is connected or disconnected from the service
+                .addConnectionCallbacks(this)
+
+                //Callbacks for failed attempt to connect client to the service
+                .addOnConnectionFailedListener(this).build();
     }
 
     /**
      * Refresh UI data
      */
     private void refreshUI() {
-        list.add(weatherData);
+        weathers.add(weatherData);
         adapter.notifyDataSetChanged();
     }
 
@@ -245,7 +319,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
      * Enable Location
      */
     private void enableLocation() {
-        // Make sure that GPS is enabled on the device
+
+        //Make sure that GPS is enabled on the device
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -267,17 +342,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    // Called when Google services are connected
     @Override
     public void onConnected(Bundle bundle) {
+        //Called when Google services are connected
+
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // If the user is not giving permission to use location we need to request those permissions
+
+            //If the user is not giving permission to use location we need to request those permissions
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
-            System.out.println("############### Request Permissions For Location Services");
+            System.out.println("######## REQUEST PERMISSIONS FOR LOCATION SERVICES");
         } else {
-            // Start location services if the permission has already been given
+            //Start location services if the permission has already been given
             startLocationServices();
-            System.out.println("############### Starting Location Services From onConnected");
+            System.out.println("######## START LOCATION SERVICES");
         }
     }
 
@@ -288,7 +365,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onLocationChanged(Location location) {
-        // Called whenever location is changed, work with location itself
+
+        //Called whenever location is changed, work with location itself
         downloadWeatherData(location);
     }
 
@@ -296,14 +374,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
      * Start Location Services
      */
     private void startLocationServices() {
-        System.out.println("############### Starting Location Services Called");
+
         try {
             LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_LOW_POWER);
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-            System.out.println("############### Requesting Location Updates");
+            System.out.println("######## REQUEST LOCATION UPDATES");
         } catch (SecurityException exception) {
             Toast.makeText(this, R.string.toast_location_services, Toast.LENGTH_LONG).show();
-            Log.v("TAG", exception.toString());
+            System.out.println("######## SECURITY EXCEPTION" + exception.toString());
         }
     }
 
@@ -311,22 +389,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        /*Request permission which is going to call onRequestPermissionsResult
-        Throw a popup for user to give permission and grab permission from grantResults in switch statement
-        grantResults: the results of the permissions being granted*/
+        //Request permission which is going to call onRequestPermissionsResult
+        //Throw a popup for user to give permission and grab permission from grantResults in switch statement
+        //grantResults: the results of the permissions being granted
 
         if (requestCode == PERMISSION_LOCATION) {
-            // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                System.out.println("############### Permission Granted - Starting Services");
 
-                // if more than zero permissions have been granted then we grab the first one and if permission  is granted we start location services
+            //If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                System.out.println("######## PERMISSION GRANTED - START SERVICE");
+
+                //if more than zero permissions have been granted then we grab the first one and if permission  is granted we start location services
                 startLocationServices();
             } else {
-                System.out.println("############### Permission Not Granted");
+                System.out.println("######## PERMISSION NOT GRANTED");
 
-                // if its not been granted show notification to user to enable location
+                //If its not been granted show notification to user to enable location
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
                     Snackbar snack = Snackbar.make(findViewById(R.id.recycler), R.string.snackbar_message_permission, Snackbar.LENGTH_LONG);
                     snack.setAction(R.string.snackbar_action_permission, new View.OnClickListener() {
                         @Override
@@ -349,6 +429,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
      * @return permission
      */
     private void checkAndRequestPermissions() {
+
         int locationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -362,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    // Broadcast Receiver to refresh UI when connected back to network
+    //Broadcast Receiver to refresh UI when connected back to network
     private final BroadcastReceiver localReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

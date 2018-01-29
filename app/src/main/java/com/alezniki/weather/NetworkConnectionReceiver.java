@@ -8,7 +8,7 @@ import android.support.v4.content.LocalBroadcastManager;
 /**
  * Network Connection Receiver
  * <p>
- * Created by nikola on 7/30/17.
+ * Created by nikola aleksic on 7/30/17.
  */
 public class NetworkConnectionReceiver extends BroadcastReceiver {
     public static final String NOTIFY_NETWORK_CHANGE = "NOTIFY_NETWORK_CHANGE";

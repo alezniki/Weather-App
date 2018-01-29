@@ -3,38 +3,130 @@ package com.alezniki.weather.model;
 import java.io.Serializable;
 
 /**
- * Created by nikola on 7/20/17.
+ * Weather data entity
+ * <p>
+ * Created by nikola aleksic on 7/20/17.
  */
-
 public class WeatherData implements Serializable {
 
+    /**
+     * Clear sky
+     */
     public static final String WEATHER_DESCRIPTION_CLEAR_SKY = "Clear";
+
+    /**
+     * Clouds
+     */
     public static final String WEATHER_DESCRIPTION_CLOUDS = "Clouds";
+
+    /**
+     * Rain
+     */
     public static final String WEATHER_DESCRIPTION_RAIN = "Rain";
+
+    /**
+     * Thunderstorm
+     */
     public static final String WEATHER_DESCRIPTION_THUNDERSTORM = "Thunderstorm";
+
+    /**
+     * Snow
+     */
     public static final String WEATHER_DESCRIPTION_SNOW = "Snow";
+
+    /**
+     * Mist
+     */
     public static final String WEATHER_DESCRIPTION_MIST = "Mist";
 
-    // City and Country
+    /**
+     * City name
+     */
     private String cityName;
+
+    /**
+     * Country
+     */
     private String country;
-    // Temperature
+
+    /**
+     * Day temperature
+     */
     private int dayTemp;
+
+    /**
+     * Night temperature
+     */
     private int nightTemp;
+
+    /**
+     * Evening temperature
+     */
     private int eveningTemp;
+
+    /**
+     * Morning temperature
+     */
     private int morningTemp;
+
+    /**
+     * Pressure
+     */
     private int pressure;
+
+    /**
+     * Humidity
+     */
     private int humidity;
-    // Weather
+
+    /**
+     * Main weather
+     */
     private String mainWeather;
+
+    /**
+     * Weather description
+     */
     private String weatherDescription;
-    // Clouds and Wind
+
+    /**
+     * Clouds
+     */
     private int clouds;
+
+    /**
+     * Wind speed
+     */
     private int windSpeed;
+
+    /**
+     * Wind direction
+     */
     private int windDirection;
-    // Date String
+
+    /**
+     * String
+     */
     private String date;
 
+    /**
+     * Constructor
+     *
+     * @param cityName           city name
+     * @param country            country
+     * @param dayTemp            day temperature
+     * @param nightTemp          night temperature
+     * @param eveningTemp        evening temperature
+     * @param morningTemp        morning temperature
+     * @param pressure           pressure
+     * @param humidity           humidity
+     * @param mainWeather        main weather
+     * @param weatherDescription weather description
+     * @param clouds             clouds
+     * @param windSpeed          wind speed
+     * @param windDirection      wind direction
+     * @param date               date
+     */
     public WeatherData(String cityName, String country, double dayTemp, double nightTemp, double eveningTemp, double morningTemp, double pressure, int humidity, String mainWeather, String weatherDescription, int clouds, double windSpeed, double windDirection, String date) {
         this.cityName = cityName;
         this.country = country;
@@ -135,6 +227,7 @@ public class WeatherData implements Serializable {
 
     /**
      * Get Weather Description
+     *
      * @return WeatherDescription
      */
     public String getWeatherDescription() {

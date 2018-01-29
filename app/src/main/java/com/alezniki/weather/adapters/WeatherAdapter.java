@@ -18,24 +18,40 @@ import java.util.List;
 /**
  * Weather Adapter
  * <p>
- * Created by nikola on 7/20/17.
+ * Created by nikola aleksic on 7/20/17.
  */
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
 
+    /**
+     * Key id
+     */
     public static final String KEY_ID = "key_id";
 
-    // List of weather data
-    private final List<WeatherData> list;
+    /**
+     * Weather data list
+     */
+    private final List<WeatherData> weathers;
+
+    /**
+     * Context
+     */
     private final Context context;
 
-    public WeatherAdapter(List<WeatherData> list, Context context) {
-        this.list = list;
+    /**
+     * Constructor
+     *
+     * @param context  context
+     * @param weathers weathers list
+     */
+    public WeatherAdapter(Context context, List<WeatherData> weathers) {
         this.context = context;
+        this.weathers = weathers;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // Create new views (invoked by the layout manager)
+
+        //Create new views (invoked by the layout manager)
         LayoutInflater inflater = LayoutInflater.from(context);
         View itemView = inflater.inflate(R.layout.weather_card, parent, false);
 
@@ -44,18 +60,18 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        // Replace the contents of a view (invoked by the layout manager)
-        // This is where you supply data that you want to display to the user
+        //Replace the contents of a view (invoked by the layout manager)
+        //This is where you supply data that you want to display to the user
 
-        // Get element from your data set at this position
-        final WeatherData weatherData = list.get(position);
+        //Get element from your data set at this position
+        final WeatherData weatherData = weathers.get(position);
 
-        // Add click listener to the view
+        //Add click listener to the view
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // Unique ID to pass between activities;
+                //Unique ID to pass between activities;
                 Intent intent = new Intent(context, DetailActivity.class);
                 intent.putExtra(KEY_ID, weatherData);
                 context.startActivity(intent);
@@ -69,45 +85,76 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         holder.tvWindSpeed.setText("Wind speed: " + String.valueOf(weatherData.getWindSpeed()) + " m/s");
 
         switch (weatherData.getMainWeather()) {
-            case WeatherData.WEATHER_DESCRIPTION_CLEAR_SKY:
+
+            case WeatherData.WEATHER_DESCRIPTION_CLEAR_SKY: {
                 holder.ivImage.setImageResource(R.drawable.ic_clear);
-                return;
-            case WeatherData.WEATHER_DESCRIPTION_CLOUDS:
+                break;
+            }
+
+            case WeatherData.WEATHER_DESCRIPTION_CLOUDS: {
                 holder.ivImage.setImageResource(R.drawable.ic_clouds);
-                return;
+                break;
+            }
+
             case WeatherData.WEATHER_DESCRIPTION_RAIN: {
                 holder.ivImage.setImageResource(R.drawable.ic_rain);
-                return;
+                break;
             }
-            case WeatherData.WEATHER_DESCRIPTION_THUNDERSTORM:
+
+            case WeatherData.WEATHER_DESCRIPTION_THUNDERSTORM: {
                 holder.ivImage.setImageResource(R.drawable.ic_thunder);
-                return;
-            case WeatherData.WEATHER_DESCRIPTION_SNOW:
+                break;
+            }
+
+            case WeatherData.WEATHER_DESCRIPTION_SNOW: {
                 holder.ivImage.setImageResource(R.drawable.ic_snow);
-                return;
-            case WeatherData.WEATHER_DESCRIPTION_MIST:
+                break;
+            }
+
+            case WeatherData.WEATHER_DESCRIPTION_MIST: {
                 holder.ivImage.setImageResource(R.drawable.ic_mist);
+                break;
+            }
         }
     }
 
     @Override
     public int getItemCount() {
-        // Return the size of your data set (invoked by the layout manager)
-        return list.size();
+        //Return the size of your data set (invoked by the layout manager)
+        return weathers.size();
     }
 
+    /**
+     * View holder
+     */
     class ViewHolder extends RecyclerView.ViewHolder {
 
+        //Date
         final TextView tvDate;
+
+        //Weather
         final TextView tvWeather;
+
+        //Temperature
         final TextView tvTemp;
+
+        //Humidity
         final TextView tvHumidity;
+
+        //Wind speed
         final TextView tvWindSpeed;
+
+        //Image icon
         final ImageView ivImage;
 
-        // Handle user events in a RecyclerView
+        //View to handle user events
         final View view;
 
+        /**
+         * Constructor
+         *
+         * @param itemView item view
+         */
         ViewHolder(View itemView) {
             super(itemView);
 
@@ -118,7 +165,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             tvWindSpeed = (TextView) itemView.findViewById(R.id.tv_wind_speed);
             ivImage = (ImageView) itemView.findViewById(R.id.iv_image);
 
-            // Now the view reference will be available to the rest of the adapter
+            //Now the view reference will be available to the rest of the adapter
             view = itemView;
         }
     }
@@ -129,18 +176,18 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
      * @param dataList weather data list
      */
     public void addDataToAdapter(List<WeatherData> dataList) {
-        this.list.addAll(dataList);
-        this.notifyItemRangeInserted(0, list.size() - 1);
+        this.weathers.addAll(dataList);
+        this.notifyItemRangeInserted(0, weathers.size() - 1);
     }
 
     /**
      * Clear Data From Adapter
      */
     public void clearDataFromAdapter() {
-        int listSize = this.list.size();
+        int listSize = this.weathers.size();
         if (listSize > 0) {
             for (int i = 0; i < listSize; i++) {
-                this.list.remove(0);
+                this.weathers.remove(0);
             }
 
             this.notifyItemRangeRemoved(0, listSize);

@@ -7,11 +7,11 @@ import android.net.NetworkInfo;
 /**
  * Network Connection
  * <p>
- * Created by nikola on 7/30/17.
+ * Created by nikola aleksic on 7/30/17.
  */
 class NetworkConnection {
 
-    // Context
+    //Context
     private final Context context;
 
     /**
@@ -32,15 +32,15 @@ class NetworkConnection {
      */
     boolean isNetworkConnected() {
 
-        // 1. Retrieves an instance of the ConnectivityManager class from the current application context.
+        //1.Retrieves an instance of the ConnectivityManager class from the current application context.
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        // 2.Retrieves an instance of the NetworkInfo class that represents the current network connection.
-        // This will be null if no network is available.
+        //2.Retrieves an instance of the NetworkInfo class that represents the current network connection.
+        //This will be null if no network is available.
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        // 3. Check if there is an available network connection and the device is connected.
-        // Should check null because in airplane mode it will be null
+        //3.Check if there is an available network connection and the device is connected.
+        //Should check null because in airplane mode it will be null
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 }
